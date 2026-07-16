@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // រក្សាទុកក្នុង Session ដើម្បីទៅកន្លែង booking.php
         $_SESSION['booking_event_id'] = $event['id'];
         $_SESSION['booking_quantity'] = $quantity;
-        redirect('/event-booking/customer/booking.php');
+        redirect('/event-booking/customer/payment.php');
     }
 }
 ?>

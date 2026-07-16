@@ -8,7 +8,7 @@ requireLogin();
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 
-if (!isset($_SESSION['booking_event_id']) || !isset($_SESSION['booking_quantity'])) {
+if (!isset($_SESSION['booking_event_id']) || !isset($_SESSION['booking_quantity']) || !isset($_SESSION['payment_verified'])) {
     redirect('/event-booking/customer/events.php');
 }
 
@@ -66,7 +66,7 @@ sendBookingConfirmation(
 );
 
 
-unset($_SESSION['booking_event_id'], $_SESSION['booking_quantity']);
+unset($_SESSION['booking_event_id'], $_SESSION['booking_quantity'], $_SESSION['payment_verified']);
 
 require 'header.php';
 ?>
