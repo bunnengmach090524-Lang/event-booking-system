@@ -2,6 +2,7 @@
 require '../config/database.php';
 require '../includes/functions.php';
 require '../vendor/autoload.php';
+require '../includes/send_email.php';
 requireLogin();
 
 use Endroid\QrCode\QrCode;
@@ -49,6 +50,21 @@ $result->saveToFile($qrPath);
 
 $stmt = $pdo->prepare("UPDATE bookings SET qr_code = ? WHERE id = ?");
 $stmt->execute([$qrFileName, $booking_id]);
+
+$userStmt = $pdo->prepare("SELECT name, email FROM users WHERE id = ?");
+$userStmt->execute([$_SESSION['user_id']]);
+$userInfo = $userStmt->fetch(PDO::FETCH_ASSOC);
+
+sendBookingConfirmation(
+    $userInfo['email'], 
+    $userInfo['name'], 
+    $event['title'], 
+    $quantity, 
+    number_format($total_price, 2), 
+    $booking_id, 
+    $qrFileName
+);
+
 
 unset($_SESSION['booking_event_id'], $_SESSION['booking_quantity']);
 
