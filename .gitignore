@@ -6,3 +6,4 @@ assets/qrcodes/*
 composer.lock
 .env
 *.log
+config/mail.php
