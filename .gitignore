@@ -1,0 +1,8 @@
+vendor/
+uploads/events/*
+!uploads/events/.gitkeep
+assets/qrcodes/*
+!assets/qrcodes/.gitkeep
+composer.lock
+.env
+*.log
