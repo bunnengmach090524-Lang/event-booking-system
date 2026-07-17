@@ -13,6 +13,7 @@ if (!$event) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
+    $category = $_POST['category'];
     $description = trim($_POST['description']);
     $location = trim($_POST['location']);
     $event_date = $_POST['event_date'];
@@ -27,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['image']['tmp_name'], $targetPath);
     }
 
-    $stmt = $pdo->prepare("UPDATE events SET title=?, description=?, image=?, location=?, event_date=?, price=?, total_tickets=? WHERE id=?");
-    $stmt->execute([$title, $description, $imageName, $location, $event_date, $price, $total_tickets, $id]);
+    $stmt = $pdo->prepare("UPDATE events SET title=?, category=?, description=?, image=?, location=?, event_date=?, price=?, total_tickets=? WHERE id=?");
+    $stmt->execute([$title, $category, $description, $imageName, $location, $event_date, $price, $total_tickets, $id]);
 
     redirect('/event-booking/admin/events/index.php');
 }
@@ -42,6 +43,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="block text-sm font-medium text-gray-700 mb-1">ចំណងជើង Event</label>
             <input type="text" name="title" required value="<?= htmlspecialchars($event['title']) ?>"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">ប្រភេទ Event</label>
+            <select name="category" required
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Concert" <?= $event['category'] === 'Concert' ? 'selected' : '' ?>>🎵 Concert</option>
+                <option value="Conference" <?= $event['category'] === 'Conference' ? 'selected' : '' ?>>💼 Conference</option>
+                <option value="Workshop" <?= $event['category'] === 'Workshop' ? 'selected' : '' ?>>🛠️ Workshop</option>
+                <option value="Sports" <?= $event['category'] === 'Sports' ? 'selected' : '' ?>>⚽ Sports</option>
+                <option value="Exhibition" <?= $event['category'] === 'Exhibition' ? 'selected' : '' ?>>🎨 Exhibition</option>
+                <option value="General" <?= $event['category'] === 'General' ? 'selected' : '' ?>>📌 General</option>
+            </select>
         </div>
 
         <div class="mb-4">

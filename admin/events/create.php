@@ -6,6 +6,7 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
+    $category = $_POST['category'];
     $description = trim($_POST['description']);
     $location = trim($_POST['location']);
     $event_date = $_POST['event_date'];
@@ -21,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['image']['tmp_name'], $targetPath);
     }
 
-    $stmt = $pdo->prepare("INSERT INTO events (title, description, image, location, event_date, price, total_tickets, created_by) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$title, $description, $imageName, $location, $event_date, $price, $total_tickets, $_SESSION['user_id']]);
+    $stmt = $pdo->prepare("INSERT INTO events (title, category, description, image, location, event_date, price, total_tickets, created_by) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->execute([$title, $category, $description, $imageName, $location, $event_date, $price, $total_tickets, $_SESSION['user_id']]);
 
     redirect('/event-booking/admin/events/index.php');
 }
@@ -37,6 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="block text-sm font-medium text-gray-700 mb-1">ចំណងជើង Event</label>
             <input type="text" name="title" required
                 class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">ប្រភេទ Event</label>
+            <select name="category" required
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Concert">🎵 Concert</option>
+                <option value="Conference">💼 Conference</option>
+                <option value="Workshop">🛠️ Workshop</option>
+                <option value="Sports">⚽ Sports</option>
+                <option value="Exhibition">🎨 Exhibition</option>
+                <option value="General">📌 General</option>
+            </select>
         </div>
 
         <div class="mb-4">
