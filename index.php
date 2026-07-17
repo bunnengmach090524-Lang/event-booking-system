@@ -129,38 +129,44 @@ $categoryIcons = [
         </p>
 
         <!-- Search Bar with Category -->
-        <form method="GET" action="index.php" class="bg-white rounded-xl shadow-2xl p-2 flex flex-col md:flex-row gap-2 max-w-4xl">
-            <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
-                <i data-lucide="search" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
-                <input type="text" name="search" placeholder="ស្វែងរក Event..." value="<?= htmlspecialchars($search) ?>"
-                    class="w-full outline-none text-gray-700 text-sm">
-            </div>
-            <div class="hidden md:block w-px bg-gray-200"></div>
-            <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
-                <i data-lucide="tag" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
-                <select name="category" class="w-full outline-none text-gray-700 text-sm bg-transparent">
-                    <option value="">ប្រភេទទាំងអស់</option>
-                    <?php foreach ($categoryIcons as $cat => $icon): ?>
-                        <option value="<?= $cat ?>" <?= $category === $cat ? 'selected' : '' ?>><?= $icon ?> <?= $cat ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="hidden md:block w-px bg-gray-200"></div>
-            <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
-                <i data-lucide="map-pin" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
-                <select name="location" class="w-full outline-none text-gray-700 text-sm bg-transparent">
-                    <option value="">ទីតាំងទាំងអស់</option>
-                    <?php foreach ($locations as $loc): ?>
-                        <option value="<?= htmlspecialchars($loc) ?>" <?= $location === $loc ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($loc) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white p-3.5 rounded-full flex-shrink-0 transition">
-                <i data-lucide="search" class="w-5 h-5"></i>
-            </button>
-        </form>
+        <div class="relative max-w-4xl">
+            <form method="GET" action="index.php" class="bg-white rounded-xl shadow-2xl p-2 flex flex-col md:flex-row gap-2">
+                <div class="flex items-center gap-2 flex-1 px-4 py-2.5 relative">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
+                    <input type="text" id="searchInput" name="search" placeholder="ស្វែងរក Event..." 
+                        value="<?= htmlspecialchars($search) ?>" autocomplete="off"
+                        class="w-full outline-none text-gray-700 text-sm">
+                </div>
+                <div class="hidden md:block w-px bg-gray-200"></div>
+                <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
+                    <i data-lucide="tag" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
+                    <select name="category" class="w-full outline-none text-gray-700 text-sm bg-transparent">
+                        <option value="">ប្រភេទទាំងអស់</option>
+                        <?php foreach ($categoryIcons as $cat => $icon): ?>
+                            <option value="<?= $cat ?>" <?= $category === $cat ? 'selected' : '' ?>><?= $icon ?> <?= $cat ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="hidden md:block w-px bg-gray-200"></div>
+                <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
+                    <select name="location" class="w-full outline-none text-gray-700 text-sm bg-transparent">
+                        <option value="">ទីតាំងទាំងអស់</option>
+                        <?php foreach ($locations as $loc): ?>
+                            <option value="<?= htmlspecialchars($loc) ?>" <?= $location === $loc ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($loc) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white p-3.5 rounded-full flex-shrink-0 transition">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <!-- Suggestion Dropdown -->
+            <div id="suggestionBox" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto"></div>
+        </div>
 
         <!-- Quick Category Pills -->
         <div class="flex flex-wrap gap-2 mt-6">
@@ -357,6 +363,71 @@ $categoryIcons = [
     const mobileMenu = document.getElementById('mobileMenu');
     menuBtn.addEventListener('click', function() {
         mobileMenu.classList.toggle('hidden');
+    });
+
+    // Search Suggestion Logic
+    const searchInput = document.getElementById('searchInput');
+    const suggestionBox = document.getElementById('suggestionBox');
+    let debounceTimer;
+
+    const categoryIcons = {
+        'Concert': '🎵', 'Conference': '💼', 'Workshop': '🛠️',
+        'Sports': '⚽', 'Exhibition': '🎨', 'General': '📌'
+    };
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 1) {
+            suggestionBox.classList.add('hidden');
+            suggestionBox.innerHTML = '';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`api/search-suggestions.php?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        suggestionBox.innerHTML = `
+                            <div class="p-4 text-center text-gray-400 text-sm">
+                                មិនរកឃើញ Event ត្រូវនឹង "${query}" ទេ
+                            </div>`;
+                    } else {
+                        suggestionBox.innerHTML = data.map(event => `
+                            <a href="auth/login.php" class="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition">
+                                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-lg">
+                                    ${categoryIcons[event.category] || '📌'}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-gray-800 text-sm truncate">${event.title}</p>
+                                    <p class="text-xs text-gray-400 truncate">📍 ${event.location}</p>
+                                </div>
+                                <span class="text-blue-600 font-bold text-sm flex-shrink-0">$${parseFloat(event.price).toFixed(2)}</span>
+                            </a>
+                        `).join('');
+                    }
+                    suggestionBox.classList.remove('hidden');
+                })
+                .catch(() => {
+                    suggestionBox.classList.add('hidden');
+                });
+        }, 300); // Debounce 300ms
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
+            suggestionBox.classList.add('hidden');
+        }
+    });
+
+    // Show dropdown again if input has value and is focused
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim().length > 0 && suggestionBox.innerHTML.trim() !== '') {
+            suggestionBox.classList.remove('hidden');
+        }
     });
 </script>
 
