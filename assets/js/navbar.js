@@ -39,9 +39,6 @@
   }
 
   // ---------- FAVORITES ----------
-  // Call from a heart button on any event card: toggleFavorite(eventId, buttonEl)
-  // Pass removeCardOnUnfavorite=true on the favorites page so unfavoriting
-  // removes the card from view immediately instead of just changing color.
   window.toggleFavorite = function (eventId, buttonEl, removeCardOnUnfavorite) {
     fetch('/event-booking/api/favorites.php', {
       method: 'POST',
@@ -147,6 +144,17 @@
   refreshFavoritesCount();
   refreshNotifications();
 
+  // Poll for new notifications every 20 seconds (auto-refresh, no click needed)
+  setInterval(refreshNotifications, 20000);
+
+  // Re-check when the tab becomes visible again (user switched back from another tab)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      refreshNotifications();
+      refreshFavoritesCount();
+    }
+  });
+
   // ---------- SEARCH SUGGESTIONS ----------
   const searchInput = document.getElementById('navSearchInput');
   const searchDropdown = document.getElementById('searchSuggestions');
@@ -193,7 +201,7 @@
             if (!data.success) return;
             renderSuggestions(data.results);
           });
-      }, 250); // debounce so we don't hit the server on every keystroke
+      }, 250);
     });
 
     document.addEventListener('click', (e) => {

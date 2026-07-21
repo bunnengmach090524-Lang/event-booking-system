@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'config/database.php';
+require_once 'includes/lang.php';
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] === 'admin') {
@@ -49,6 +50,7 @@ $categoryIcons = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Booking System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
@@ -67,53 +69,86 @@ $categoryIcons = [
         .card-hover { transition: all 0.3s ease; }
         .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); }
     </style>
+    <script>
+        // Apply saved theme instantly, before paint, to avoid a flash
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-gray-100">
 
 <!-- Navbar -->
-<nav class="bg-white/80 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-    <div class="flex items-center gap-2 font-bold text-xl text-gray-800">
+<nav class="bg-white/80 dark:bg-gray-800/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center gap-2 font-bold text-xl text-gray-800 dark:text-white">
         <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
             <i data-lucide="ticket" class="w-5 h-5 text-white"></i>
         </div>
         EventPlace
     </div>
 
-    <div class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-        <a href="#home" class="hover:text-blue-600 transition">ទំព័រដើម</a>
-        <a href="#events" class="hover:text-blue-600 transition">Events</a>
-        <a href="#features" class="hover:text-blue-600 transition">Feature</a>
-        <a href="#about" class="hover:text-blue-600 transition">អំពីយើង</a>
-        <a href="#contact" class="hover:text-blue-600 transition">ទំនាក់ទំនង</a>
+    <div class="hidden md:flex gap-8 text-sm font-medium text-gray-600 dark:text-gray-300">
+        <a href="#home" class="hover:text-blue-600 dark:hover:text-blue-400 transition">ទំព័រដើម</a>
+        <a href="#events" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Events</a>
+        <a href="#features" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Feature</a>
+        <a href="#about" class="hover:text-blue-600 dark:hover:text-blue-400 transition">អំពីយើង</a>
+        <a href="#contact" class="hover:text-blue-600 dark:hover:text-blue-400 transition">ទំនាក់ទំនង</a>
     </div>
 
-    <div class="hidden md:flex gap-3 items-center">
-        <a href="auth/login.php" class="text-gray-600 hover:text-blue-600 px-4 py-2 text-sm font-medium transition">ចូលប្រើ</a>
-        <a href="auth/register.php" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all">
-            ចុះឈ្មោះ
-        </a>
-    </div>
+    <div class="flex gap-2 sm:gap-3 items-center">
+        <!-- Language toggle -->
+        <div id="langToggle" data-current="<?= htmlspecialchars($currentLang) ?>"
+             class="hidden sm:flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 text-xs font-medium cursor-pointer select-none">
+            <span data-lang="en" class="lang-option px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">EN</span>
+            <span data-lang="km" class="lang-option px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">ខ្មែរ</span>
+        </div>
 
-    <button id="menuBtn" class="md:hidden text-gray-700 p-2">
-        <i data-lucide="menu" class="w-6 h-6"></i>
-    </button>
+        <!-- Theme toggle -->
+        <button id="themeToggle" aria-label="Toggle theme"
+                class="w-9 h-9 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <i data-lucide="sun" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+
+        <div class="hidden md:flex gap-3 items-center">
+            <a href="auth/login.php" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-4 py-2 text-sm font-medium transition">ចូលប្រើ</a>
+            <a href="auth/register.php" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all">
+                ចុះឈ្មោះ
+            </a>
+        </div>
+
+        <button id="menuBtn" class="md:hidden text-gray-700 dark:text-gray-300 p-2">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </div>
 </nav>
 
 <!-- Mobile Menu -->
-<div id="mobileMenu" class="hidden md:hidden bg-white shadow-lg px-6 py-4 sticky top-[72px] z-40">
-    <a href="#home" class="block py-2.5 text-gray-700 font-medium border-b border-gray-100">ទំព័រដើម</a>
-    <a href="#events" class="block py-2.5 text-gray-700 font-medium border-b border-gray-100">Events</a>
-    <a href="#features" class="block py-2.5 text-gray-700 font-medium border-b border-gray-100">Feature</a>
-    <a href="#about" class="block py-2.5 text-gray-700 font-medium border-b border-gray-100">អំពីយើង</a>
-    <a href="#contact" class="block py-2.5 text-gray-700 font-medium border-b border-gray-100">ទំនាក់ទំនង</a>
+<div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800 shadow-lg px-6 py-4 sticky top-[72px] z-40">
+    <a href="#home" class="block py-2.5 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-700">ទំព័រដើម</a>
+    <a href="#events" class="block py-2.5 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-700">Events</a>
+    <a href="#features" class="block py-2.5 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-700">Feature</a>
+    <a href="#about" class="block py-2.5 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-700">អំពីយើង</a>
+    <a href="#contact" class="block py-2.5 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-700">ទំនាក់ទំនង</a>
+
+    <!-- Language toggle (mobile, shown here since hidden in top bar on small screens) -->
+    <div class="sm:hidden flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700">
+        <span class="text-sm text-gray-500 dark:text-gray-400">Language</span>
+        <div id="langToggleMobile" data-current="<?= htmlspecialchars($currentLang) ?>"
+             class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 text-xs font-medium cursor-pointer select-none">
+            <span data-lang="en" class="lang-option px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">EN</span>
+            <span data-lang="km" class="lang-option px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">ខ្មែរ</span>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-3 mt-4">
-        <a href="auth/login.php" class="text-center border border-gray-300 text-gray-700 py-2.5 rounded-full text-sm font-medium">ចូលប្រើ</a>
+        <a href="auth/login.php" class="text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2.5 rounded-full text-sm font-medium">ចូលប្រើ</a>
         <a href="auth/register.php" class="text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-full text-sm font-semibold">ចុះឈ្មោះ</a>
     </div>
 </div>
 
 <!-- Hero Section -->
-<section id="home" class="relative overflow-hidden bg-gradient-to-br from-indigo-700 via-blue-700 to-purple-700 hero-blob">
+<section id="home" class="relative overflow-hidden bg-gradient-to-br from-indigo-700 via-blue-700 to-purple-700 dark:from-indigo-900 dark:via-blue-900 dark:to-purple-900 hero-blob">
     <div class="absolute top-16 right-16 w-24 h-24 rounded-full bg-cyan-300/30 float-anim hidden md:block"></div>
     <div class="absolute bottom-10 right-40 w-16 h-16 rounded-full bg-pink-300/30 float-anim hidden md:block" style="animation-delay: 1s;"></div>
     <div class="absolute top-1/3 left-10 w-3 h-3 rounded-full bg-white/40 hidden md:block"></div>
@@ -130,27 +165,27 @@ $categoryIcons = [
 
         <!-- Search Bar with Category -->
         <div class="relative max-w-4xl">
-            <form method="GET" action="index.php" class="bg-white rounded-xl shadow-2xl p-2 flex flex-col md:flex-row gap-2">
+            <form method="GET" action="index.php" class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-2 flex flex-col md:flex-row gap-2">
                 <div class="flex items-center gap-2 flex-1 px-4 py-2.5 relative">
                     <i data-lucide="search" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
                     <input type="text" id="searchInput" name="search" placeholder="ស្វែងរក Event..." 
                         value="<?= htmlspecialchars($search) ?>" autocomplete="off"
-                        class="w-full outline-none text-gray-700 text-sm">
+                        class="w-full outline-none text-gray-700 dark:text-gray-200 dark:bg-transparent text-sm">
                 </div>
-                <div class="hidden md:block w-px bg-gray-200"></div>
+                <div class="hidden md:block w-px bg-gray-200 dark:bg-gray-600"></div>
                 <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
                     <i data-lucide="tag" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
-                    <select name="category" class="w-full outline-none text-gray-700 text-sm bg-transparent">
+                    <select name="category" class="w-full outline-none text-gray-700 dark:text-gray-200 text-sm bg-transparent">
                         <option value="">ប្រភេទទាំងអស់</option>
                         <?php foreach ($categoryIcons as $cat => $icon): ?>
                             <option value="<?= $cat ?>" <?= $category === $cat ? 'selected' : '' ?>><?= $icon ?> <?= $cat ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="hidden md:block w-px bg-gray-200"></div>
+                <div class="hidden md:block w-px bg-gray-200 dark:bg-gray-600"></div>
                 <div class="flex items-center gap-2 flex-1 px-4 py-2.5">
                     <i data-lucide="map-pin" class="w-5 h-5 text-gray-400 flex-shrink-0"></i>
-                    <select name="location" class="w-full outline-none text-gray-700 text-sm bg-transparent">
+                    <select name="location" class="w-full outline-none text-gray-700 dark:text-gray-200 text-sm bg-transparent">
                         <option value="">ទីតាំងទាំងអស់</option>
                         <?php foreach ($locations as $loc): ?>
                             <option value="<?= htmlspecialchars($loc) ?>" <?= $location === $loc ? 'selected' : '' ?>>
@@ -164,11 +199,9 @@ $categoryIcons = [
                 </button>
             </form>
 
-            <!-- Suggestion Dropdown -->
-            <div id="suggestionBox" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto"></div>
+            <div id="suggestionBox" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto"></div>
         </div>
 
-        <!-- Quick Category Pills -->
         <div class="flex flex-wrap gap-2 mt-6">
             <?php foreach ($categoryIcons as $cat => $icon): ?>
                 <a href="index.php?category=<?= urlencode($cat) ?>#events" 
@@ -183,42 +216,42 @@ $categoryIcons = [
 <!-- Features -->
 <section id="features" class="max-w-6xl mx-auto py-20 px-6">
     <p class="text-center font-script text-2xl text-pink-500 mb-1">ហេតុអ្វីជ្រើសរើសយើង</p>
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-14">Features ពិសេស</h2>
+    <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-14">Features ពិសេស</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="text-center group">
-            <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 group-hover:-translate-y-1 transition-all duration-300">
-                <i data-lucide="search" class="w-7 h-7 text-blue-600 group-hover:text-white transition-colors"></i>
+            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 group-hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="search" class="w-7 h-7 text-blue-600 dark:text-blue-400 group-hover:text-white transition-colors"></i>
             </div>
-            <h3 class="font-semibold text-gray-800 mb-2">ស្វែងរកងាយស្រួល</h3>
-            <p class="text-gray-500 text-sm px-4">ស្វែងរក Event តាមទីតាំង ថ្ងៃខែ បានយ៉ាងឆាប់រហ័ស</p>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">ស្វែងរកងាយស្រួល</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm px-4">ស្វែងរក Event តាមទីតាំង ថ្ងៃខែ បានយ៉ាងឆាប់រហ័ស</p>
         </div>
         <div class="text-center group">
-            <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 group-hover:-translate-y-1 transition-all duration-300">
-                <i data-lucide="qr-code" class="w-7 h-7 text-purple-600 group-hover:text-white transition-colors"></i>
+            <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 group-hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="qr-code" class="w-7 h-7 text-purple-600 dark:text-purple-400 group-hover:text-white transition-colors"></i>
             </div>
-            <h3 class="font-semibold text-gray-800 mb-2">QR Code ភ្លាមៗ</h3>
-            <p class="text-gray-500 text-sm px-4">ទទួល QR Code សំបុត្រភ្លាមៗ ក្រោយកក់ជោគជ័យ</p>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">QR Code ភ្លាមៗ</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm px-4">ទទួល QR Code សំបុត្រភ្លាមៗ ក្រោយកក់ជោគជ័យ</p>
         </div>
         <div class="text-center group">
-            <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 group-hover:-translate-y-1 transition-all duration-300">
-                <i data-lucide="mail-check" class="w-7 h-7 text-green-600 group-hover:text-white transition-colors"></i>
+            <div class="w-16 h-16 bg-green-100 dark:bg-green-900/40 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 group-hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="mail-check" class="w-7 h-7 text-green-600 dark:text-green-400 group-hover:text-white transition-colors"></i>
             </div>
-            <h3 class="font-semibold text-gray-800 mb-2">ជូនដំណឹងតាម Email</h3>
-            <p class="text-gray-500 text-sm px-4">ទទួល Email បញ្ជាក់ការកក់ភ្លាមៗ ជាមួយ QR Code</p>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">ជូនដំណឹងតាម Email</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm px-4">ទទួល Email បញ្ជាក់ការកក់ភ្លាមៗ ជាមួយ QR Code</p>
         </div>
     </div>
 </section>
 
 <!-- Featured Events -->
-<section id="events" class="bg-gray-100 py-20 px-6">
+<section id="events" class="bg-gray-100 dark:bg-gray-800/50 py-20 px-6">
     <div class="max-w-6xl mx-auto">
         <p class="text-center font-script text-2xl text-pink-500 mb-1">Upcoming Event</p>
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-14">Featured Events</h2>
+        <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-14">Featured Events</h2>
 
         <?php if (empty($events)): ?>
             <div class="text-center py-16">
-                <i data-lucide="calendar-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
-                <p class="text-gray-400">មិនទាន់មាន Event ត្រូវនឹងលក្ខខណ្ឌស្វែងរកទេ</p>
+                <i data-lucide="calendar-x" class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
+                <p class="text-gray-400 dark:text-gray-500">មិនទាន់មាន Event ត្រូវនឹងលក្ខខណ្ឌស្វែងរកទេ</p>
             </div>
         <?php else: ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -226,7 +259,7 @@ $categoryIcons = [
                 $remaining = $event['total_tickets'] - $event['tickets_sold'];
                 $catIcon = $categoryIcons[$event['category']] ?? '📌';
             ?>
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden card-hover">
                 <div class="relative">
                     <?php if ($event['image']): ?>
                         <img src="uploads/events/<?= htmlspecialchars($event['image']) ?>" class="w-full h-48 object-cover">
@@ -235,27 +268,27 @@ $categoryIcons = [
                             <i data-lucide="ticket" class="w-12 h-12 text-white/80"></i>
                         </div>
                     <?php endif; ?>
-                    <span class="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-semibold px-3 py-1 rounded-full text-gray-700">
+                    <span class="absolute top-3 left-3 bg-white/90 dark:bg-gray-900/80 backdrop-blur text-xs font-semibold px-3 py-1 rounded-full text-gray-700 dark:text-gray-200">
                         <?= $catIcon ?> <?= htmlspecialchars($event['category']) ?>
                     </span>
                 </div>
                 <div class="p-5">
-                    <h3 class="font-bold text-gray-800 mb-2 line-clamp-1"><?= htmlspecialchars($event['title']) ?></h3>
-                    <div class="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                    <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-1"><?= htmlspecialchars($event['title']) ?></h3>
+                    <div class="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-1">
                         <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                         <?= date('D, d M Y', strtotime($event['event_date'])) ?>
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-gray-400 mb-4">
+                    <div class="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-4">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
                         <?= htmlspecialchars($event['location']) ?>
                     </div>
-                    <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                    <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
                         <div>
-                            <p class="text-xs text-gray-400">តម្លៃ</p>
-                            <p class="font-bold text-blue-600">$<?= number_format($event['price'], 2) ?></p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500">តម្លៃ</p>
+                            <p class="font-bold text-blue-600 dark:text-blue-400">$<?= number_format($event['price'], 2) ?></p>
                         </div>
                         <a href="auth/login.php" 
-                           class="border-2 border-blue-600 text-blue-600 text-xs font-bold px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all">
+                           class="border-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 text-xs font-bold px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all">
                             <?= $remaining > 0 ? 'កក់ឥឡូវនេះ' : 'អស់ហើយ' ?>
                         </a>
                     </div>
@@ -267,7 +300,7 @@ $categoryIcons = [
 
         <div class="text-center mt-12">
             <a href="auth/register.php" 
-               class="inline-flex items-center gap-2 border-2 border-gray-800 text-gray-800 px-6 py-3 rounded-full font-semibold hover:bg-gray-800 hover:text-white transition-all">
+               class="inline-flex items-center gap-2 border-2 border-gray-800 dark:border-gray-200 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-full font-semibold hover:bg-gray-800 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900 transition-all">
                 មើល Event ទាំងអស់ <i data-lucide="arrow-right" class="w-4 h-4"></i>
             </a>
         </div>
@@ -279,24 +312,24 @@ $categoryIcons = [
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
             <p class="font-script text-2xl text-pink-500 mb-1">អំពីយើង</p>
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">ជាមួយ EventPlace<br>រៀបចំ Event ក្លាយជារឿងងាយ</h2>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">ជាមួយ EventPlace<br>រៀបចំ Event ក្លាយជារឿងងាយ</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
                 EventPlace ជាប្រព័ន្ធកក់សំបុត្រ Online ដែលជួយអ្នករៀបចំ Event ភ្ជាប់ទំនាក់ទំនងជាមួយអ្នកចូលរួម
                 ដោយងាយស្រួល សុវត្ថិភាព និងមានប្រសិទ្ធភាព។ ចាប់ពីការគ្រប់គ្រង Event រហូតដល់ Check-in
                 តាមរយៈ QR Code យើងធានាថារាល់ Event របស់អ្នកដំណើរការរលូន។
             </p>
             <div class="grid grid-cols-3 gap-6">
                 <div>
-                    <p class="text-2xl font-bold text-blue-600">500+</p>
-                    <p class="text-gray-400 text-sm">Events</p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">500+</p>
+                    <p class="text-gray-400 dark:text-gray-500 text-sm">Events</p>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-purple-600">10K+</p>
-                    <p class="text-gray-400 text-sm">អ្នកប្រើប្រាស់</p>
+                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">10K+</p>
+                    <p class="text-gray-400 dark:text-gray-500 text-sm">អ្នកប្រើប្រាស់</p>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-green-600">99%</p>
-                    <p class="text-gray-400 text-sm">ពេញចិត្ត</p>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">99%</p>
+                    <p class="text-gray-400 dark:text-gray-500 text-sm">ពេញចិត្ត</p>
                 </div>
             </div>
         </div>
@@ -307,7 +340,7 @@ $categoryIcons = [
 </section>
 
 <!-- CTA -->
-<section class="bg-gradient-to-r from-blue-700 to-purple-700 py-16 px-6 text-center">
+<section class="bg-gradient-to-r from-blue-700 to-purple-700 dark:from-blue-900 dark:to-purple-900 py-16 px-6 text-center">
     <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">ត្រៀមខ្លួនចូលរួម Event ដ៏អស្ចារ្យបន្ទាប់?</h2>
     <p class="text-blue-100 mb-8">ចុះឈ្មោះឥឡូវនេះ ដើម្បីមិនខកខានឱកាសល្អៗ</p>
     <a href="auth/register.php" 
@@ -356,6 +389,12 @@ $categoryIcons = [
     </div>
 </footer>
 
+<!-- Reuse the same theme/language toggle logic that powers the logged-in navbar.
+     Its favorites/notifications calls are guarded by `if (element)` checks and
+     fail silently as unauthenticated (401) since there's no logged-in user on
+     this public page, so nothing here breaks. -->
+<script src="/event-booking/assets/js/navbar.js" defer></script>
+
 <script>
     lucide.createIcons();
 
@@ -365,7 +404,20 @@ $categoryIcons = [
         mobileMenu.classList.toggle('hidden');
     });
 
-    // Search Suggestion Logic
+    // Mirror language toggle for the mobile menu's own switch (small screens
+    // hide the top-bar one, so this duplicate keeps it reachable there too)
+    const langToggleMobile = document.getElementById('langToggleMobile');
+    if (langToggleMobile) {
+        langToggleMobile.addEventListener('click', function (e) {
+            const target = e.target.closest('[data-lang]');
+            if (!target) return;
+            fetch(`/event-booking/includes/lang.php?set=${target.dataset.lang}&ajax=1`)
+                .then(r => r.json())
+                .then(data => { if (data.success) window.location.reload(); });
+        });
+    }
+
+    // Search Suggestion Logic (unchanged)
     const searchInput = document.getElementById('searchInput');
     const suggestionBox = document.getElementById('suggestionBox');
     let debounceTimer;
@@ -389,22 +441,23 @@ $categoryIcons = [
             fetch(`api/search-suggestions.php?q=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.length === 0) {
+                    const results = data.results ?? data; // supports both response shapes
+                    if (!results || results.length === 0) {
                         suggestionBox.innerHTML = `
                             <div class="p-4 text-center text-gray-400 text-sm">
                                 មិនរកឃើញ Event ត្រូវនឹង "${query}" ទេ
                             </div>`;
                     } else {
-                        suggestionBox.innerHTML = data.map(event => `
-                            <a href="auth/login.php" class="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition">
+                        suggestionBox.innerHTML = results.map(event => `
+                            <a href="auth/login.php" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 transition">
                                 <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-lg">
                                     ${categoryIcons[event.category] || '📌'}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-800 text-sm truncate">${event.title}</p>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm truncate">${event.title}</p>
                                     <p class="text-xs text-gray-400 truncate">📍 ${event.location}</p>
                                 </div>
-                                <span class="text-blue-600 font-bold text-sm flex-shrink-0">$${parseFloat(event.price).toFixed(2)}</span>
+                                <span class="text-blue-600 dark:text-blue-400 font-bold text-sm flex-shrink-0">$${parseFloat(event.price).toFixed(2)}</span>
                             </a>
                         `).join('');
                     }
@@ -413,17 +466,15 @@ $categoryIcons = [
                 .catch(() => {
                     suggestionBox.classList.add('hidden');
                 });
-        }, 300); // Debounce 300ms
+        }, 300);
     });
 
-    // Hide dropdown when clicking outside
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
             suggestionBox.classList.add('hidden');
         }
     });
 
-    // Show dropdown again if input has value and is focused
     searchInput.addEventListener('focus', function() {
         if (this.value.trim().length > 0 && suggestionBox.innerHTML.trim() !== '') {
             suggestionBox.classList.remove('hidden');
