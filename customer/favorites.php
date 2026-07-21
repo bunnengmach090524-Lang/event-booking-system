@@ -2,65 +2,39 @@
 require '../config/database.php';
 require 'header.php';
 
-$search = $_GET['search'] ?? '';
-
-$sql = "SELECT * FROM events WHERE event_date >= NOW() AND status = 'active'";
-$params = [];
-
-if ($search) {
-    $sql .= " AND (title LIKE ? OR location LIKE ?)";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
-}
-
-$sql .= " ORDER BY event_date ASC";
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
+$stmt = $pdo->prepare(
+    "SELECT e.* FROM favorites f
+     JOIN events e ON e.id = f.event_id
+     WHERE f.user_id = ?
+     ORDER BY f.created_at DESC"
+);
+$stmt->execute([$_SESSION['user_id']]);
 $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$favStmt = $pdo->prepare("SELECT event_id FROM favorites WHERE user_id = ?");
-$favStmt->execute([$_SESSION['user_id']]);
-$favoritedIds = $favStmt->fetchAll(PDO::FETCH_COLUMN);
-$favoritedIds = array_flip($favoritedIds);
 ?>
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">🎉 Events កំពុងលក់សំបុត្រ</h1>
-        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">រកឃើញ Event ដ៏ល្អបំផុតសម្រាប់អ្នក</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">❤️ ចំណូលចិត្តរបស់ខ្ញុំ</h1>
+        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Event ដែលអ្នកបានរក្សាទុក</p>
     </div>
 </div>
 
-<!-- Search Bar -->
-<form method="GET" class="mb-8">
-    <div class="flex gap-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-2 max-w-xl">
-        <div class="flex items-center gap-2 flex-1 px-3">
-            <i data-lucide="search" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-            <input type="text" name="search" placeholder="ស្វែងរក Event ឬទីតាំង..." value="<?= htmlspecialchars($search) ?>"
-                class="w-full outline-none text-sm text-gray-700 dark:text-gray-200 dark:placeholder-gray-500 bg-transparent py-2">
-        </div>
-        <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:shadow-md transition">
-            ស្វែងរក
-        </button>
-    </div>
-</form>
-
-<!-- Event Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="favoritesGrid">
     <?php if (empty($events)): ?>
         <div class="col-span-3 text-center py-20">
-            <i data-lucide="calendar-x" class="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4"></i>
-            <p class="text-gray-400 dark:text-gray-500">មិនទាន់មាន Event ណាទេពេលនេះ</p>
+            <i data-lucide="heart-off" class="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4"></i>
+            <p class="text-gray-400 dark:text-gray-500 mb-4">អ្នកមិនទាន់មាន Event ចំណូលចិត្តទេ</p>
+            <a href="events.php" class="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-900 transition">
+                មើល Events ទាំងអស់ <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
         </div>
     <?php endif; ?>
 
     <?php foreach ($events as $event):
         $remaining = $event['total_tickets'] - $event['tickets_sold'];
         $soldOut = $remaining <= 0;
-        $isFavorited = isset($favoritedIds[$event['id']]);
     ?>
-    <div class="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+    <div class="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300" data-fav-card="<?= $event['id'] ?>">
         <div class="relative overflow-hidden">
             <?php if ($event['image']): ?>
                 <img src="/event-booking/uploads/events/<?= htmlspecialchars($event['image']) ?>" 
@@ -71,10 +45,10 @@ $favoritedIds = array_flip($favoritedIds);
                 </div>
             <?php endif; ?>
 
-            <button onclick="toggleFavorite(<?= $event['id'] ?>, this)"
-                    class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-900/90 backdrop-blur flex items-center justify-center hover:scale-110 transition-transform <?= $isFavorited ? 'text-red-500' : 'text-gray-400 dark:text-gray-500' ?>"
-                    aria-label="Toggle favorite">
-                <i data-lucide="heart" class="w-4 h-4" <?= $isFavorited ? 'fill="currentColor"' : '' ?>></i>
+            <button onclick="toggleFavorite(<?= $event['id'] ?>, this, true)"
+                    class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-900/90 backdrop-blur flex items-center justify-center hover:scale-110 transition-transform text-red-500"
+                    aria-label="Remove from favorites">
+                <i data-lucide="heart" class="w-4 h-4" fill="currentColor"></i>
             </button>
 
             <?php if ($soldOut): ?>

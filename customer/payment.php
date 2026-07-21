@@ -1,6 +1,6 @@
 <?php
 require '../config/database.php';
-require 'header.php';
+require '../includes/functions.php';
 
 if (!isset($_SESSION['booking_event_id']) || !isset($_SESSION['booking_quantity'])) {
     redirect('/event-booking/customer/events.php');
@@ -20,6 +20,8 @@ if (!$event) {
 $total_price = $event['price'] * $quantity;
 $error = '';
 
+// Handle payment form submission BEFORE header.php outputs any HTML,
+// since redirect() needs to send a Location header before any output starts.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cardName = trim($_POST['card_name']);
     $cardNumber = preg_replace('/\s+/', '', $_POST['card_number']);
@@ -41,70 +43,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/event-booking/customer/booking.php');
     }
 }
+
+require 'header.php';
 ?>
 
 <div class="max-w-lg mx-auto">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">💳 ទូទាត់ប្រាក់</h1>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">💳 ទូទាត់ប្រាក់</h1>
 
     <!-- Order Summary -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 class="font-semibold text-gray-700 mb-3">សេចក្តីសង្ខេប</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-3">សេចក្តីសង្ខេប</h3>
         <div class="flex justify-between text-sm mb-2">
-            <span class="text-gray-500">Event:</span>
-            <span class="font-medium"><?= htmlspecialchars($event['title']) ?></span>
+            <span class="text-gray-500 dark:text-gray-400">Event:</span>
+            <span class="font-medium text-gray-800 dark:text-gray-100"><?= htmlspecialchars($event['title']) ?></span>
         </div>
         <div class="flex justify-between text-sm mb-2">
-            <span class="text-gray-500">ចំនួនសំបុត្រ:</span>
-            <span class="font-medium"><?= $quantity ?></span>
+            <span class="text-gray-500 dark:text-gray-400">ចំនួនសំបុត្រ:</span>
+            <span class="font-medium text-gray-800 dark:text-gray-100"><?= $quantity ?></span>
         </div>
         <div class="flex justify-between text-sm mb-2">
-            <span class="text-gray-500">តម្លៃក្នុងមួយ:</span>
-            <span class="font-medium">$<?= number_format($event['price'], 2) ?></span>
+            <span class="text-gray-500 dark:text-gray-400">តម្លៃក្នុងមួយ:</span>
+            <span class="font-medium text-gray-800 dark:text-gray-100">$<?= number_format($event['price'], 2) ?></span>
         </div>
-        <div class="border-t mt-3 pt-3 flex justify-between">
-            <span class="font-bold text-gray-800">សរុប:</span>
-            <span class="font-bold text-blue-600 text-lg">$<?= number_format($total_price, 2) ?></span>
+        <div class="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 flex justify-between">
+            <span class="font-bold text-gray-800 dark:text-white">សរុប:</span>
+            <span class="font-bold text-blue-600 dark:text-blue-400 text-lg">$<?= number_format($total_price, 2) ?></span>
         </div>
     </div>
 
     <!-- Payment Form -->
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div class="flex items-center gap-2 mb-4">
             <span class="text-2xl">💳</span>
-            <h3 class="font-semibold text-gray-700">ព័ត៌មានកាត</h3>
-            <span class="ml-auto text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Demo Mode</span>
+            <h3 class="font-semibold text-gray-700 dark:text-gray-200">ព័ត៌មានកាត</h3>
+            <span class="ml-auto text-xs bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded">Demo Mode</span>
         </div>
 
         <?php if ($error): ?>
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm"><?= htmlspecialchars($error) ?></div>
+            <div class="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 p-3 rounded mb-4 text-sm"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">ឈ្មោះលើកាត</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ឈ្មោះលើកាត</label>
                 <input type="text" name="card_name" placeholder="SOK DARA" required
                     value="<?= htmlspecialchars($_POST['card_name'] ?? '') ?>"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">លេខកាត</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">លេខកាត</label>
                 <input type="text" name="card_number" placeholder="4111 1111 1111 1111" maxlength="19" required
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     oninput="this.value = this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim()">
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ថ្ងៃផុតកំណត់</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ថ្ងៃផុតកំណត់</label>
                     <input type="text" name="expiry" placeholder="MM/YY" maxlength="5" required
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         oninput="this.value = this.value.replace(/\D/g,'').replace(/(\d{2})(\d)/,'$1/$2').substring(0,5)">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CVV</label>
                     <input type="text" name="cvv" placeholder="123" maxlength="4" required
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         oninput="this.value = this.value.replace(/\D/g,'')">
                 </div>
             </div>
@@ -113,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 🔒 ទូទាត់ $<?= number_format($total_price, 2) ?>
             </button>
 
-            <p class="text-xs text-gray-400 text-center mt-3">
+            <p class="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
                 ⚠️ នេះជា Demo Payment មិនមែនការទូទាត់ពិតទេ។ សូមប្រើលេខកាតណាមួយ (16 ខ្ទង់)
             </p>
         </form>
