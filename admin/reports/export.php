@@ -1,6 +1,7 @@
 <?php
-require '../../config/database.php';
-require '../../includes/functions.php';
+require_once '../../config/database.php';
+require_once '../../includes/functions.php';
+require_once '../../includes/lang.php';
 requireAdmin();
 
 $from = $_GET['from'] ?? date('Y-m-01');
@@ -24,7 +25,16 @@ header('Content-Disposition: attachment; filename="report_' . $from . '_to_' . $
 echo "\xEF\xBB\xBF"; // UTF-8 BOM សម្រាប់ Excel
 
 $output = fopen('php://output', 'w');
-fputcsv($output, ['Booking ID', 'Event', 'Category', 'Customer', 'Email', 'Quantity', 'Total Price ($)', 'Booked At']);
+fputcsv($output, [
+    t('csv_booking_id'),
+    t('csv_event'),
+    t('csv_category'),
+    t('csv_customer'),
+    t('csv_email'),
+    t('csv_quantity'),
+    t('csv_total_price'),
+    t('csv_booked_at'),
+]);
 
 foreach ($bookings as $b) {
     fputcsv($output, [

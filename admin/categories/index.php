@@ -23,11 +23,11 @@ $categories = $pdo->query("
 
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">🏷️ គ្រប់គ្រង Category</h1>
-        <p class="text-gray-400 text-sm mt-1">សរុប <?= count($categories) ?> Category</p>
+        <h1 class="text-2xl font-bold text-gray-800">🏷️ <?= t('manage_categories_label') ?></h1>
+        <p class="text-gray-400 text-sm mt-1"><?= sprintf(t('total_categories_label'), count($categories)) ?></p>
     </div>
     <a href="create.php" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-        + បង្កើត Category ថ្មី
+        <?= t('create_new_category_label') ?>
     </a>
 </div>
 
@@ -35,16 +35,16 @@ $categories = $pdo->query("
     <table class="w-full text-left">
         <thead class="bg-gray-50 border-b">
             <tr>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">Icon</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ឈ្មោះ Category</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ចំនួន Events</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">សកម្មភាព</th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('icon_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('category_name_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('events_count_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('action_label') ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($categories)): ?>
                 <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-gray-400">មិនទាន់មាន Category</td>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-400"><?= t('category_empty_label') ?></td>
                 </tr>
             <?php endif; ?>
 
@@ -55,23 +55,23 @@ $categories = $pdo->query("
                 <td class="px-6 py-4">
                     <a href="../events/index.php?category=<?= urlencode($cat['name']) ?>"
                        class="text-blue-600 hover:underline text-sm">
-                        <?= $cat['events_count'] ?> Event<?= $cat['events_count'] != 1 ? 's' : '' ?>
+                        <?= $cat['events_count'] ?> <?= t('events_label') ?>
                     </a>
                 </td>
                 <td class="px-6 py-4">
-                    <a href="edit.php?id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline mr-3">កែប្រែ</a>
+                    <a href="edit.php?id=<?= $cat['id'] ?>" class="text-blue-600 hover:underline mr-3"><?= t('edit_label') ?></a>
 
                     <?php if ($cat['events_count'] > 0): ?>
-                        <span class="text-gray-300 cursor-not-allowed" title="មិនអាចលុបបានទេ ព្រោះមាន Event កំពុងប្រើ Category នេះ">
-                            លុប
+                        <span class="text-gray-300 cursor-not-allowed" title="<?= htmlspecialchars(t('cannot_delete_category_tooltip')) ?>">
+                            <?= t('delete_label') ?>
                         </span>
                     <?php else: ?>
                         <form method="POST" action="delete.php" class="inline">
                             <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
                             <input type="hidden" name="id" value="<?= $cat['id'] ?>">
                             <button type="submit"
-                                onclick="return confirm('តើប្រាកដជាលុប Category នេះ?')"
-                                class="text-red-600 hover:underline">លុប</button>
+                                onclick="return confirm('<?= addslashes(t('confirm_delete_category')) ?>')"
+                                class="text-red-600 hover:underline"><?= t('delete_label') ?></button>
                         </form>
                     <?php endif; ?>
                 </td>

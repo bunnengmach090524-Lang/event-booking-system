@@ -66,7 +66,7 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
         <div class="flex items-center gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
             <!-- Language toggle (hidden on very small screens) -->
             <div id="langToggle" data-current="<?= htmlspecialchars($currentLang) ?>"
-                 class="hidden xs:flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 text-xs font-medium cursor-pointer select-none">
+                class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 text-xs font-medium cursor-pointer select-none">
                 <span data-lang="en" class="lang-option px-2 sm:px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">EN</span>
                 <span data-lang="km" class="lang-option px-2 sm:px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">ខ្មែរ</span>
             </div>

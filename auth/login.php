@@ -1,6 +1,7 @@
 <?php
 require '../config/database.php';
 require '../includes/functions.php';
+require '../includes/lang.php';
 
 $error = '';
 
@@ -23,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect('/event-booking/customer/events.php');
         }
     } else {
-        $error = "អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ!";
+        $error = t('login_error_invalid');
     }
 }
 ?>
@@ -32,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ចូលប្រើ - Event Booking</title>
+    <title><?= t('login_page_title') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,10 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             EventPlace
         </a>
         <h1 class="text-4xl font-bold text-white mb-4 relative z-10 leading-tight">
-            រកឃើញ Event ដ៏អស្ចារ្យ<br>កក់សំបុត្រភ្លាមៗ
+            <?= t('login_hero_title_l1') ?><br><?= t('login_hero_title_l2') ?>
         </h1>
         <p class="text-blue-100 text-lg relative z-10 max-w-md">
-            ចូលប្រើគណនីរបស់អ្នក ដើម្បីបន្តទស្សនា និងកក់សំបុត្រ Event ចាំបាច់
+            <?= t('login_hero_subtitle') ?>
         </p>
 
         <div class="flex gap-8 mt-12 relative z-10">
@@ -75,11 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div>
                 <p class="text-3xl font-bold text-white">24/7</p>
-                <p class="text-blue-200 text-sm">Support Online</p>
+                <p class="text-blue-200 text-sm"><?= t('stat_support_label') ?></p>
             </div>
             <div>
                 <p class="text-3xl font-bold text-white">100%</p>
-                <p class="text-blue-200 text-sm">សុវត្ថិភាព</p>
+                <p class="text-blue-200 text-sm"><?= t('stat_secure_label') ?></p>
             </div>
         </div>
     </div>
@@ -95,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 EventPlace
             </a>
 
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">សូមស្វាគមន៍ត្រឡប់មកវិញ 👋</h2>
-            <p class="text-gray-500 mb-8">សូមចូលប្រើគណនីរបស់អ្នក</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= t('welcome_back') ?></h2>
+            <p class="text-gray-500 mb-8"><?= t('login_subtitle') ?></p>
 
             <?php if ($error): ?>
                 <div class="bg-red-50 border border-red-200 text-red-600 p-3.5 rounded-lg mb-5 text-sm flex items-center gap-2">
@@ -107,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">អ៊ីមែល</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('email_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="mail" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="email" name="email" placeholder="you@example.com" required
@@ -116,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">លេខសម្ងាត់</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('password_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="lock" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="password" name="password" placeholder="••••••••" required
@@ -126,14 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <button type="submit" 
                     class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
-                    ចូលប្រើ
+                    <?= t('login_button') ?>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </form>
 
             <p class="text-center text-sm text-gray-500 mt-8">
-                មិនទាន់មានគណនី? 
-                <a href="register.php" class="text-blue-600 hover:underline font-semibold">ចុះឈ្មោះឥឡូវនេះ</a>
+                <?= t('no_account_yet') ?>
+                <a href="register.php" class="text-blue-600 hover:underline font-semibold"><?= t('register_now') ?></a>
             </p>
         </div>
     </div>

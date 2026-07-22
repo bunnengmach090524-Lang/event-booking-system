@@ -57,34 +57,34 @@ $categoryIcons = [
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">📈 Reports ផ្ទាំងអស់</h1>
-        <p class="text-gray-400 text-sm mt-1">វិភាគទិន្នន័យលក់លម្អិត តាមរយៈពេលកំណត់</p>
+        <h1 class="text-2xl font-bold text-gray-800">📈 <?= t('report_title') ?></h1>
+        <p class="text-gray-400 text-sm mt-1"><?= t('report_subtitle') ?></p>
     </div>
     <a href="export.php?from=<?= $from ?>&to=<?= $to ?>"
        class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:shadow-sm transition-all">
-        <i data-lucide="download" class="w-4 h-4 text-green-600"></i> Export CSV
+        <i data-lucide="download" class="w-4 h-4 text-green-600"></i> <?= t('btn_export_csv') ?>
     </a>
 </div>
 
 <!-- Date Range Filter -->
 <form method="GET" class="animate-in delay-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-wrap gap-3 items-end">
     <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">ពីថ្ងៃ</label>
+        <label class="block text-xs font-medium text-gray-500 mb-1"><?= t('label_from_date') ?></label>
         <input type="date" name="from" value="<?= htmlspecialchars($from) ?>"
             class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
     <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">ដល់ថ្ងៃ</label>
+        <label class="block text-xs font-medium text-gray-500 mb-1"><?= t('label_to_date') ?></label>
         <input type="date" name="to" value="<?= htmlspecialchars($to) ?>"
             class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
     <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-        <i data-lucide="filter" class="w-4 h-4"></i> ត្រង
+        <i data-lucide="filter" class="w-4 h-4"></i> <?= t('btn_filter') ?>
     </button>
     <div class="flex gap-2 ml-auto">
-        <a href="?from=<?= date('Y-m-d') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition">ថ្ងៃនេះ</a>
-        <a href="?from=<?= date('Y-m-01') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition">ខែនេះ</a>
-        <a href="?from=<?= date('Y-01-01') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition">ឆ្នាំនេះ</a>
+        <a href="?from=<?= date('Y-m-d') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition"><?= t('quick_today') ?></a>
+        <a href="?from=<?= date('Y-m-01') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition"><?= t('quick_this_month') ?></a>
+        <a href="?from=<?= date('Y-01-01') ?>&to=<?= date('Y-m-d') ?>" class="text-xs text-gray-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition"><?= t('quick_this_year') ?></a>
     </div>
 </form>
 
@@ -94,28 +94,28 @@ $categoryIcons = [
         <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center mb-3">
             <i data-lucide="dollar-sign" class="w-5 h-5 text-purple-600"></i>
         </div>
-        <p class="text-gray-400 text-xs font-medium mb-1">Total Revenue</p>
+        <p class="text-gray-400 text-xs font-medium mb-1"><?= t('stat_total_revenue') ?></p>
         <p class="text-2xl font-bold text-gray-800">$<?= number_format($summary['total_revenue'], 2) ?></p>
     </div>
     <div class="animate-in delay-3 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
         <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-3">
             <i data-lucide="ticket" class="w-5 h-5 text-blue-600"></i>
         </div>
-        <p class="text-gray-400 text-xs font-medium mb-1">Tickets Sold</p>
+        <p class="text-gray-400 text-xs font-medium mb-1"><?= t('stat_tickets_sold') ?></p>
         <p class="text-2xl font-bold text-gray-800"><?= $summary['total_tickets'] ?></p>
     </div>
     <div class="animate-in delay-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
         <div class="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center mb-3">
             <i data-lucide="receipt" class="w-5 h-5 text-green-600"></i>
         </div>
-        <p class="text-gray-400 text-xs font-medium mb-1">Total Bookings</p>
+        <p class="text-gray-400 text-xs font-medium mb-1"><?= t('stat_total_bookings') ?></p>
         <p class="text-2xl font-bold text-gray-800"><?= $summary['total_bookings'] ?></p>
     </div>
     <div class="animate-in delay-5 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
         <div class="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center mb-3">
             <i data-lucide="trending-up" class="w-5 h-5 text-orange-600"></i>
         </div>
-        <p class="text-gray-400 text-xs font-medium mb-1">Average Order</p>
+        <p class="text-gray-400 text-xs font-medium mb-1"><?= t('stat_avg_order') ?></p>
         <p class="text-2xl font-bold text-gray-800">$<?= number_format($avgOrderValue, 2) ?></p>
     </div>
 </div>
@@ -124,17 +124,17 @@ $categoryIcons = [
     <!-- Revenue by Category -->
     <div class="animate-in delay-3 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-700">🎯 Revenue តាម Category</h3>
+            <h3 class="font-semibold text-gray-700">🎯 <?= t('revenue_by_category_title') ?></h3>
         </div>
         <?php if (empty($byCategory)): ?>
-            <p class="text-gray-400 text-sm text-center py-10">មិនទាន់មានទិន្នន័យសម្រាប់រយៈពេលនេះ</p>
+            <p class="text-gray-400 text-sm text-center py-10"><?= t('msg_no_data_range') ?></p>
         <?php else: ?>
         <table class="w-full text-left">
             <thead class="bg-gray-50 border-b border-gray-100">
                 <tr>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500">Category</th>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right">សំបុត្រ</th>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right">Revenue</th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500"><?= t('th_category') ?></th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right"><?= t('th_tickets') ?></th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right"><?= t('th_revenue') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -153,18 +153,18 @@ $categoryIcons = [
     <!-- Revenue by Event -->
     <div class="animate-in delay-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-700">🎪 Revenue តាម Event</h3>
+            <h3 class="font-semibold text-gray-700">🎪 <?= t('revenue_by_event_title') ?></h3>
         </div>
         <?php if (empty($byEvent)): ?>
-            <p class="text-gray-400 text-sm text-center py-10">មិនទាន់មានទិន្នន័យសម្រាប់រយៈពេលនេះ</p>
+            <p class="text-gray-400 text-sm text-center py-10"><?= t('msg_no_data_range') ?></p>
         <?php else: ?>
         <div class="max-h-96 overflow-y-auto">
         <table class="w-full text-left">
             <thead class="bg-gray-50 border-b border-gray-100 sticky top-0">
                 <tr>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500">Event</th>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right">សំបុត្រ</th>
-                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right">Revenue</th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500"><?= t('th_event') ?></th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right"><?= t('th_tickets') ?></th>
+                    <th class="px-6 py-2.5 text-xs font-semibold text-gray-500 text-right"><?= t('th_revenue') ?></th>
                 </tr>
             </thead>
             <tbody>

@@ -83,10 +83,10 @@ $categoryLabels = json_encode(array_column($categoryData, 'category'));
 $categoryValues = json_encode(array_column($categoryData, 'total'));
 
 $stats = [
-    ['label' => 'សរុប Events', 'value' => $totalEvents, 'icon' => 'calendar-days', 'color' => 'blue'],
-    ['label' => 'សរុប Bookings', 'value' => $totalBookings, 'icon' => 'ticket', 'color' => 'green'],
-    ['label' => 'សរុប Revenue', 'value' => '$' . number_format($totalRevenue, 2), 'icon' => 'dollar-sign', 'color' => 'purple'],
-    ['label' => 'Events បោះបង់', 'value' => $cancelledEvents, 'icon' => 'circle-slash', 'color' => 'red'],
+    ['label' => t('stat_total_events'), 'value' => $totalEvents, 'icon' => 'calendar-days', 'color' => 'blue'],
+    ['label' => t('stat_total_bookings'), 'value' => $totalBookings, 'icon' => 'ticket', 'color' => 'green'],
+    ['label' => t('stat_total_revenue'), 'value' => '$' . number_format($totalRevenue, 2), 'icon' => 'dollar-sign', 'color' => 'purple'],
+    ['label' => t('stat_cancelled_events'), 'value' => $cancelledEvents, 'icon' => 'circle-slash', 'color' => 'red'],
 ];
 $colorMap = [
     'blue'   => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'ring' => 'group-hover:ring-blue-100'],
@@ -101,12 +101,12 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
 
 <div class="mb-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">📊 Dashboard</h1>
-        <p class="text-gray-400 text-sm mt-1">ស្វាគមន៍មកវិញ, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?> 👋</p>
+        <h1 class="text-2xl font-bold text-gray-800">📊 <?= t('dashboard_label') ?></h1>
+        <p class="text-gray-400 text-sm mt-1"><?= t('dashboard_welcome') ?>, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?> 👋</p>
     </div>
     <a href="export-bookings.php" 
        class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:shadow-sm transition-all">
-        <i data-lucide="download" class="w-4 h-4 text-green-600"></i> Download CSV
+        <i data-lucide="download" class="w-4 h-4 text-green-600"></i> <?= t('download_csv_label') ?>
     </a>
 </div>
 
@@ -132,7 +132,7 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
         <div class="absolute right-16 bottom-0 w-16 h-16 bg-white/10 rounded-full"></div>
         <?php if ($nextEvent): ?>
             <p class="text-blue-100 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Event ជិតដល់បំផុត
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> <?= t('next_event_label') ?>
             </p>
             <h3 class="text-xl font-bold mb-3 relative z-10"><?= htmlspecialchars($nextEvent['title']) ?></h3>
             <div class="flex flex-wrap gap-4 text-sm text-blue-100 relative z-10">
@@ -140,7 +140,7 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                 <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-4 h-4"></i> <?= htmlspecialchars($nextEvent['location']) ?></span>
             </div>
         <?php else: ?>
-            <p class="text-blue-100 text-sm relative z-10">មិនទាន់មាន Event ជិតដល់ទេពេលនេះ</p>
+            <p class="text-blue-100 text-sm relative z-10"><?= t('no_upcoming_event') ?></p>
         <?php endif; ?>
     </div>
 
@@ -165,8 +165,8 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                 <span class="text-xl font-bold text-gray-800"><?= $checkinRate ?>%</span>
             </div>
         </div>
-        <p class="font-semibold text-gray-700 text-sm">Check-in Rate</p>
-        <p class="text-gray-400 text-xs mt-0.5"><?= $checkedInBookings ?>/<?= $paidBookings ?> សំបុត្រ</p>
+        <p class="font-semibold text-gray-700 text-sm"><?= t('checkin_rate_label') ?></p>
+        <p class="text-gray-400 text-xs mt-0.5"><?= $checkedInBookings ?>/<?= $paidBookings ?> <?= t('tickets_unit') ?></p>
     </div>
 </div>
 
@@ -176,16 +176,16 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
     <div class="lg:col-span-2 animate-in delay-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 class="font-semibold text-gray-700 flex items-center gap-2">
-                <i data-lucide="trending-up" class="w-4.5 h-4.5 text-blue-600"></i> ការលក់សំបុត្រ
+                <i data-lucide="trending-up" class="w-4.5 h-4.5 text-blue-600"></i> <?= t('ticket_sales_label') ?>
             </h3>
             <div class="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-                <a href="?range=daily" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'daily' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>">Daily</a>
-                <a href="?range=monthly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'monthly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>">Monthly</a>
-                <a href="?range=yearly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'yearly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>">Yearly</a>
+                <a href="?range=daily" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'daily' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('daily_label') ?></a>
+                <a href="?range=monthly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'monthly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('monthly_label') ?></a>
+                <a href="?range=yearly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'yearly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('yearly_label') ?></a>
             </div>
         </div>
         <?php if (empty($salesData)): ?>
-            <p class="text-gray-400 text-sm text-center py-12">មិនទាន់មានទិន្នន័យលក់សម្រាប់រយៈពេលនេះ</p>
+            <p class="text-gray-400 text-sm text-center py-12"><?= t('no_sales_data_label') ?></p>
         <?php else: ?>
             <canvas id="salesChart"></canvas>
         <?php endif; ?>
@@ -194,10 +194,10 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
     <!-- Category Donut -->
     <div class="animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
         <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <i data-lucide="pie-chart" class="w-4.5 h-4.5 text-purple-600"></i> Events តាម Category
+            <i data-lucide="pie-chart" class="w-4.5 h-4.5 text-purple-600"></i> <?= t('events_by_category_label') ?>
         </h3>
         <?php if (empty($categoryData)): ?>
-            <p class="text-gray-400 text-sm">មិនទាន់មានទិន្នន័យ</p>
+            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <canvas id="categoryChart"></canvas>
         <?php endif; ?>
@@ -208,10 +208,10 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
     <div class="lg:col-span-2 animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
         <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <i data-lucide="trophy" class="w-4.5 h-4.5 text-amber-500"></i> Event លក់ដាច់បំផុត
+            <i data-lucide="trophy" class="w-4.5 h-4.5 text-amber-500"></i> <?= t('best_selling_events_label') ?>
         </h3>
         <?php if (empty($topEvents)): ?>
-            <p class="text-gray-400 text-sm">មិនទាន់មានទិន្នន័យ</p>
+            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 <?php foreach ($topEvents as $i => $e):
@@ -238,10 +238,10 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
     <!-- Top Locations -->
     <div class="animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
         <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <i data-lucide="map-pin" class="w-4.5 h-4.5 text-rose-500"></i> ទីតាំងពេញនិយម
+            <i data-lucide="map-pin" class="w-4.5 h-4.5 text-rose-500"></i> <?= t('popular_locations_label') ?>
         </h3>
         <?php if (empty($topLocations)): ?>
-            <p class="text-gray-400 text-sm">មិនទាន់មានទិន្នន័យ</p>
+            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <div class="space-y-4">
                 <?php foreach ($topLocations as $i => $loc):
@@ -253,7 +253,7 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                             <span class="text-base w-5 text-center flex-shrink-0"><?= $medals[$i] ?? ($i + 1) . '.' ?></span>
                             <span class="line-clamp-1"><?= htmlspecialchars($loc['location']) ?></span>
                         </span>
-                        <span class="text-gray-400 text-xs flex-shrink-0"><?= $loc['total_events'] ?> event<?= $loc['total_events'] > 1 ? 's' : '' ?></span>
+                        <span class="text-gray-400 text-xs flex-shrink-0"><?= $loc['total_events'] ?> <?= t('events_label') ?></span>
                     </div>
                     <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                         <div class="bg-gradient-to-r from-rose-500 to-orange-400 h-2 rounded-full transition-all duration-700 ease-out"
@@ -275,14 +275,14 @@ new Chart(document.getElementById('salesChart').getContext('2d'), {
         labels: <?= $chartLabels ?>,
         datasets: [
             {
-                label: 'ចំនួនសំបុត្រលក់',
+                label: '<?= addslashes(t('tickets_sold_label')) ?>',
                 data: <?= $chartTickets ?>,
                 backgroundColor: 'rgba(59, 130, 246, 0.75)',
                 borderRadius: 6,
                 yAxisID: 'y',
             },
             {
-                label: 'Revenue ($)',
+                label: '<?= addslashes(t('revenue_dollar_label')) ?>',
                 data: <?= $chartRevenue ?>,
                 backgroundColor: 'rgba(168, 85, 247, 0.75)',
                 borderRadius: 6,

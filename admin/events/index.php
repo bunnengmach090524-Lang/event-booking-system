@@ -44,20 +44,20 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php unset($_SESSION['success']); endif; ?>
 
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-    <h1 class="text-2xl font-bold text-gray-800">🎫 គ្រប់គ្រង Events</h1>
+    <h1 class="text-2xl font-bold text-gray-800">🎫 <?= t('manage_events_label') ?></h1>
     <a href="create.php" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-        + បង្កើត Event ថ្មី
+        <?= t('create_new_event_label') ?>
     </a>
 </div>
 
 <!-- Location + Category Filter -->
 <form method="GET" class="bg-white rounded-lg shadow p-4 mb-5 flex flex-wrap items-center gap-3">
     <label class="text-sm font-semibold text-gray-600 flex items-center gap-1.5">
-        📍 ត្រងតាមទីតាំង:
+        📍 <?= t('filter_by_location_label') ?>
     </label>
     <select name="location" onchange="this.form.submit()"
         class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">-- គ្រប់ទីតាំង --</option>
+        <option value=""><?= t('all_locations_option') ?></option>
         <?php foreach ($locations as $loc): ?>
             <option value="<?= htmlspecialchars($loc) ?>" <?= $locationFilter === $loc ? 'selected' : '' ?>>
                 <?= htmlspecialchars($loc) ?>
@@ -66,11 +66,11 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </select>
 
     <label class="text-sm font-semibold text-gray-600 flex items-center gap-1.5">
-        🏷️ ត្រងតាមប្រភេទ:
+        🏷️ <?= t('filter_by_category_label') ?>
     </label>
     <select name="category" onchange="this.form.submit()"
         class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">-- គ្រប់ប្រភេទ --</option>
+        <option value=""><?= t('all_categories_option') ?></option>
         <?php foreach ($allCategories as $cat): ?>
             <option value="<?= htmlspecialchars($cat['name']) ?>" <?= $categoryFilter === $cat['name'] ? 'selected' : '' ?>>
                 <?= htmlspecialchars($cat['icon']) ?> <?= htmlspecialchars($cat['name']) ?>
@@ -79,7 +79,7 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </select>
 
     <?php if ($locationFilter !== '' || $categoryFilter !== ''): ?>
-        <a href="index.php" class="text-sm text-gray-400 hover:text-gray-600">សម្អាត Filter</a>
+        <a href="index.php" class="text-sm text-gray-400 hover:text-gray-600"><?= t('clear_filter_label') ?></a>
     <?php endif; ?>
 </form>
 
@@ -87,20 +87,20 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <table class="w-full text-left">
         <thead class="bg-gray-50 border-b">
             <tr>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ចំណងជើង</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ប្រភេទ</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ទីតាំង</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ថ្ងៃ</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">តម្លៃ</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">សំបុត្រ</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">ស្ថានភាព</th>
-                <th class="px-6 py-3 text-sm font-semibold text-gray-600">សកម្មភាព</th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('title_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('category_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('location_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('date_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('price_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('tickets_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('status_label') ?></th>
+                <th class="px-6 py-3 text-sm font-semibold text-gray-600"><?= t('action_label') ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($events)): ?>
                 <tr>
-                    <td colspan="8" class="px-6 py-8 text-center text-gray-400">មិនទាន់មាន Event</td>
+                    <td colspan="8" class="px-6 py-8 text-center text-gray-400"><?= t('event_empty_label') ?></td>
                 </tr>
             <?php endif; ?>
 
@@ -123,13 +123,13 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td class="px-6 py-4 text-gray-500"><?= $event['tickets_sold'] ?>/<?= $event['total_tickets'] ?></td>
                 <td class="px-6 py-4">
                     <?php if (($event['status'] ?? 'active') === 'cancelled'): ?>
-                        <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">បោះបង់</span>
+                        <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full"><?= t('status_cancelled_label') ?></span>
                     <?php else: ?>
-                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">សកម្ម</span>
+                        <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full"><?= t('status_active_label') ?></span>
                     <?php endif; ?>
                 </td>
                 <td class="px-6 py-4">
-                    <a href="edit.php?id=<?= $event['id'] ?>" class="text-blue-600 hover:underline mr-3">កែប្រែ</a>
+                    <a href="edit.php?id=<?= $event['id'] ?>" class="text-blue-600 hover:underline mr-3"><?= t('edit_label') ?></a>
 
                     <?php if ($event['tickets_sold'] > 0): ?>
                         <?php if (($event['status'] ?? 'active') !== 'cancelled'): ?>
@@ -137,16 +137,16 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
                                 <input type="hidden" name="id" value="<?= $event['id'] ?>">
                                 <button type="submit"
-                                    onclick="return confirm('Event នេះមានការកក់សំបុត្ររួចហើយ។ តើប្រាកដជាបោះបង់ (Cancel)?')"
-                                    class="text-orange-600 hover:underline">បោះបង់</button>
+                                    onclick="return confirm('<?= addslashes(t('confirm_cancel_event')) ?>')"
+                                    class="text-orange-600 hover:underline"><?= t('cancel_action_label') ?></button>
                             </form>
                         <?php else: ?>
                             <form method="POST" action="reactivate.php" class="inline">
                                 <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
                                 <input type="hidden" name="id" value="<?= $event['id'] ?>">
                                 <button type="submit"
-                                    onclick="return confirm('តើប្រាកដជាធ្វើឲ្យ Event នេះសកម្មឡើងវិញ?')"
-                                    class="text-green-600 hover:underline">ធ្វើសកម្មឡើងវិញ</button>
+                                    onclick="return confirm('<?= addslashes(t('confirm_reactivate_event')) ?>')"
+                                    class="text-green-600 hover:underline"><?= t('reactivate_label') ?></button>
                             </form>
                         <?php endif; ?>
                     <?php else: ?>
@@ -154,8 +154,8 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
                             <input type="hidden" name="id" value="<?= $event['id'] ?>">
                             <button type="submit"
-                                onclick="return confirm('តើប្រាកដជាលុប?')"
-                                class="text-red-600 hover:underline">លុប</button>
+                                onclick="return confirm('<?= addslashes(t('confirm_delete_generic')) ?>')"
+                                class="text-red-600 hover:underline"><?= t('delete_label') ?></button>
                         </form>
                     <?php endif; ?>
                 </td>

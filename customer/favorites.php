@@ -14,8 +14,8 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">❤️ ចំណូលចិត្តរបស់ខ្ញុំ</h1>
-        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Event ដែលអ្នកបានរក្សាទុក</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white"><?= t('favorites_title') ?></h1>
+        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1"><?= t('favorites_subtitle') ?></p>
     </div>
 </div>
 
@@ -23,9 +23,9 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php if (empty($events)): ?>
         <div class="col-span-3 text-center py-20">
             <i data-lucide="heart-off" class="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4"></i>
-            <p class="text-gray-400 dark:text-gray-500 mb-4">អ្នកមិនទាន់មាន Event ចំណូលចិត្តទេ</p>
+            <p class="text-gray-400 dark:text-gray-500 mb-4"><?= t('no_favorites') ?></p>
             <a href="events.php" class="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-900 transition">
-                មើល Events ទាំងអស់ <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                <?= t('browse_events') ?> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </a>
         </div>
     <?php endif; ?>
@@ -53,11 +53,11 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <?php if ($soldOut): ?>
                 <div class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                    សំបុត្រអស់
+                    <?= t('sold_out') ?>
                 </div>
             <?php else: ?>
                 <div class="absolute top-3 right-3 bg-white/95 dark:bg-gray-900/90 backdrop-blur text-green-600 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                    <i data-lucide="ticket" class="w-3 h-3"></i> <?= $remaining ?> នៅសល់
+                    <i data-lucide="ticket" class="w-3 h-3"></i> <?= $remaining ?> <?= t('tickets_remaining') ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -79,7 +79,7 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span class="text-xl font-bold text-blue-600 dark:text-blue-400">$<?= number_format($event['price'], 2) ?></span>
                 <a href="event-detail.php?id=<?= $event['id'] ?>" 
                    class="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 group-hover:bg-blue-600 group-hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                    មើលលម្អិត <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    <?= t('view_details') ?> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </a>
             </div>
         </div>

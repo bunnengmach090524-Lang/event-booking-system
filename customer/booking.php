@@ -4,6 +4,7 @@ require '../includes/functions.php';
 require '../includes/notify.php';
 require '../vendor/autoload.php';
 require '../includes/send_email.php';
+require '../includes/lang.php';
 requireLogin();
 
 use Endroid\QrCode\QrCode;
@@ -100,8 +101,8 @@ if (isset($_GET['id'])) {
         $pdo,
         (int) $_SESSION['user_id'],
         'booking_confirmed',
-        'កក់សំបុត្រជោគជ័យ',
-        'អ្នកបានកក់សំបុត្រសម្រាប់ Event "' . $event['title'] . '" ចំនួន ' . $quantity . ' សន្លឹកដោយជោគជ័យ។',
+        t('notify_booking_title'),
+        sprintf(t('notify_booking_message'), $quantity, $event['title']),
         '/event-booking/customer/my-tickets.php'
     );
 
@@ -120,21 +121,21 @@ require 'header.php';
 
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-8 max-w-lg mx-auto text-center">
     <div class="text-5xl mb-4">✅</div>
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">កក់សំបុត្រជោគជ័យ!</h1>
-    <p class="text-gray-500 dark:text-gray-400 mb-6">សូមរក្សា QR Code នេះទុកសម្រាប់ Check-in</p>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2"><?= t('booking_success_title') ?></h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-6"><?= t('booking_success_subtitle') ?></p>
 
     <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6 text-left text-gray-700 dark:text-gray-200">
-        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white">Event:</span> <?= htmlspecialchars($event['title']) ?></p>
-        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white">ចំនួនសំបុត្រ:</span> <?= $quantity ?></p>
-        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white">តម្លៃសរុប:</span> $<?= number_format($total_price, 2) ?></p>
-        <p><span class="font-semibold text-gray-800 dark:text-white">លេខកក់:</span> #<?= $booking_id ?></p>
+        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white"><?= t('label_event') ?>:</span> <?= htmlspecialchars($event['title']) ?></p>
+        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white"><?= t('label_quantity') ?>:</span> <?= $quantity ?></p>
+        <p class="mb-2"><span class="font-semibold text-gray-800 dark:text-white"><?= t('label_total') ?>:</span> $<?= number_format($total_price, 2) ?></p>
+        <p><span class="font-semibold text-gray-800 dark:text-white"><?= t('label_booking_number') ?>:</span> #<?= $booking_id ?></p>
     </div>
 
     <img src="/event-booking/assets/qrcodes/<?= $qrFileName ?>" class="mx-auto mb-6 w-48 h-48">
 
     <a href="/event-booking/customer/my-tickets.php" 
        class="block bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
-        មើលសំបុត្ររបស់ខ្ញុំ
+        <?= t('view_my_tickets') ?>
     </a>
 </div>
 

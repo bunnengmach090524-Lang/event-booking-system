@@ -1,6 +1,7 @@
 <?php
 require '../config/database.php';
 require '../includes/functions.php';
+require '../includes/lang.php';
 
 $error = '';
 
@@ -11,13 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'];
 
     if ($password !== $confirm_password) {
-        $error = "លេខសម្ងាត់មិនត្រូវគ្នា!";
+        $error = t('register_error_mismatch');
     } else {
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         
         if ($stmt->rowCount() > 0) {
-            $error = "អ៊ីមែលនេះបានប្រើរួចហើយ!";
+            $error = t('register_error_email_exists');
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ចុះឈ្មោះ - Event Booking</title>
+    <title><?= t('register_page_title') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,10 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             EventPlace
         </a>
         <h1 class="text-4xl font-bold text-white mb-4 relative z-10 leading-tight">
-            ចាប់ផ្តើមដំណើរ<br>របស់អ្នកឥឡូវនេះ
+            <?= t('register_hero_title_l1') ?><br><?= t('register_hero_title_l2') ?>
         </h1>
         <p class="text-blue-100 text-lg relative z-10 max-w-md mb-10">
-            ចុះឈ្មោះឥឡូវនេះ ដើម្បីទស្សនា និងកក់សំបុត្រ Event ដ៏អស្ចារ្យបានយ៉ាងឆាប់រហ័ស
+            <?= t('register_hero_subtitle') ?>
         </p>
 
         <div class="space-y-4 relative z-10">
@@ -75,19 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-4 h-4"></i>
                 </div>
-                <span class="text-sm">កក់សំបុត្រក្នុងពេលឆាប់រហ័ស</span>
+                <span class="text-sm"><?= t('benefit1') ?></span>
             </div>
             <div class="flex items-center gap-3 text-white">
                 <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-4 h-4"></i>
                 </div>
-                <span class="text-sm">ទទួល QR Code + Email ភ្លាមៗ</span>
+                <span class="text-sm"><?= t('benefit2') ?></span>
             </div>
             <div class="flex items-center gap-3 text-white">
                 <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-4 h-4"></i>
                 </div>
-                <span class="text-sm">សុវត្ថិភាព និងជឿទុកចិត្តបាន</span>
+                <span class="text-sm"><?= t('benefit3') ?></span>
             </div>
         </div>
     </div>
@@ -102,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 EventPlace
             </a>
 
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">បង្កើតគណនីថ្មី ✨</h2>
-            <p class="text-gray-500 mb-8">បំពេញព័ត៌មានខាងក្រោមដើម្បីចាប់ផ្តើម</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2"><?= t('create_account') ?></h2>
+            <p class="text-gray-500 mb-8"><?= t('register_subtitle') ?></p>
 
             <?php if ($error): ?>
                 <div class="bg-red-50 border border-red-200 text-red-600 p-3.5 rounded-lg mb-5 text-sm flex items-center gap-2">
@@ -114,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">ឈ្មោះពេញ</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('full_name_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="user" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="text" name="name" placeholder="Sok Dara" required
@@ -123,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">អ៊ីមែល</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('email_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="mail" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="email" name="email" placeholder="you@example.com" required
@@ -132,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">លេខសម្ងាត់</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('password_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="lock" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="password" name="password" placeholder="••••••••" required
@@ -141,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">បញ្ជាក់លេខសម្ងាត់</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5"><?= t('confirm_password_label') ?></label>
                     <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-3 input-focus transition-shadow">
                         <i data-lucide="lock" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
                         <input type="password" name="confirm_password" placeholder="••••••••" required
@@ -151,14 +152,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <button type="submit" 
                     class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
-                    ចុះឈ្មោះ
+                    <?= t('register_button') ?>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </form>
 
             <p class="text-center text-sm text-gray-500 mt-8">
-                មានគណនីរួចហើយ? 
-                <a href="login.php" class="text-blue-600 hover:underline font-semibold">ចូលប្រើ</a>
+                <?= t('have_account') ?>
+                <a href="login.php" class="text-blue-600 hover:underline font-semibold"><?= t('login_now') ?></a>
             </p>
         </div>
     </div>

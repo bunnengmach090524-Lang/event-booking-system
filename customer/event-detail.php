@@ -1,6 +1,7 @@
 <?php
 require '../config/database.php';
 require '../includes/functions.php';
+require '../includes/lang.php'; // loaded early so t() is available before the POST/error handling below
 
 $id = $_GET['id'] ?? null;
 $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ?");
@@ -21,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity = (int)$_POST['quantity'];
 
     if ($quantity < 1) {
-        $error = "សូមជ្រើសរើសចំនួនសំបុត្រយ៉ាងតិច 1";
+        $error = t('min_qty_error');
     } elseif ($quantity > $remaining) {
-        $error = "សំបុត្រនៅសល់មិនគ្រប់គ្រាន់! នៅសល់តែ $remaining";
+        $error = sprintf(t('insufficient_tickets'), $remaining);
     } else {
         // រក្សាទុកក្នុង Session ដើម្បីទៅកន្លែង booking.php
         $_SESSION['booking_event_id'] = $event['id'];
@@ -57,11 +58,11 @@ require 'header.php';
 
         <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">$<?= number_format($event['price'], 2) ?> / សំបុត្រ</span>
+                <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">$<?= number_format($event['price'], 2) ?> <?= t('per_ticket') ?></span>
                 <?php if ($remaining > 0): ?>
-                    <span class="text-sm text-green-600 dark:text-green-400"><?= $remaining ?> សំបុត្រនៅសល់</span>
+                    <span class="text-sm text-green-600 dark:text-green-400"><?= $remaining ?> <?= t('tickets_remaining') ?></span>
                 <?php else: ?>
-                    <span class="text-sm text-red-600 dark:text-red-400 font-bold">សំបុត្រអស់ហើយ</span>
+                    <span class="text-sm text-red-600 dark:text-red-400 font-bold"><?= t('sold_out_full') ?></span>
                 <?php endif; ?>
             </div>
 
@@ -74,12 +75,12 @@ require 'header.php';
                 <input type="number" name="quantity" min="1" max="<?= $remaining ?>" value="1" required
                     class="w-24 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 font-semibold">
-                    កក់សំបុត្រឥឡូវនេះ
+                    <?= t('book_now') ?>
                 </button>
             </form>
             <?php else: ?>
                 <button disabled class="w-full bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 py-2 rounded-md cursor-not-allowed">
-                    សំបុត្រអស់ហើយ
+                    <?= t('sold_out_full') ?>
                 </button>
             <?php endif; ?>
         </div>

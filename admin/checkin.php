@@ -24,28 +24,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$booking) {
-            $message = "❌ រកមិនឃើញ Booking នេះទេ!";
+            $message = t('msg_booking_not_found');
             $messageType = 'error';
         } elseif ($booking['is_checked_in']) {
-            $message = "⚠️ សំបុត្រនេះបាន Check-in រួចហើយ!";
+            $message = t('msg_already_checked_in');
             $messageType = 'warning';
         } elseif ($booking['status'] !== 'paid') {
-            $message = "❌ សំបុត្រនេះមិនទាន់ទូទាត់ប្រាក់!";
+            $message = t('msg_not_paid');
             $messageType = 'error';
         } else {
             $stmt = $pdo->prepare("UPDATE bookings SET is_checked_in = TRUE WHERE id = ?");
             $stmt->execute([$booking_id]);
             $booking['is_checked_in'] = true;
 
-            $message = "✅ Check-in ជោគជ័យ!";
+            $message = t('msg_checkin_success');
             $messageType = 'success';
         }
     } else {
-        $message = "❌ QR Code មិនត្រឹមត្រូវ ឬ Format ខុស!";
+        $message = t('msg_invalid_qr');
         $messageType = 'error';
     }
 }
+
+// Strings needed on the JS side (camera scanner messages)
+$jsLang = [
+    'qrRecognized'      => t('js_qr_recognized'),
+    'cameraUnavailable' => t('js_camera_unavailable'),
+    'cameraNotFound'    => t('js_camera_not_found'),
+    'cameraPermission'  => t('js_camera_permission_denied'),
+    'cameraInUse'       => t('js_camera_in_use'),
+    'cameraErrorPrefix' => t('js_camera_error_prefix'),
+    'switchingToManual' => t('js_switching_to_manual'),
+];
 ?>
+
+<script>
+    const jsLang = <?= json_encode($jsLang, JSON_UNESCAPED_UNICODE) ?>;
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<h1 class="text-2xl font-bold text-gray-800 mb-6">📷 Check-in អ្នកចូលរួម</h1>
+<h1 class="text-2xl font-bold text-gray-800 mb-6">📷 <?= t('checkin_page_title') ?></h1>
 
 <div class="bg-white rounded-lg shadow p-6 max-w-xl">
 
@@ -63,11 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="flex gap-2 mb-5 bg-gray-100 p-1 rounded-lg w-fit">
         <button type="button" id="tabCamera" onclick="switchMode('camera')"
             class="px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 bg-white shadow text-blue-600 flex items-center gap-2">
-            <i data-lucide="camera" class="w-4 h-4"></i> Scan ដោយ Camera
+            <i data-lucide="camera" class="w-4 h-4"></i> <?= t('scan_camera_label') ?>
         </button>
         <button type="button" id="tabManual" onclick="switchMode('manual')"
             class="px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-gray-500 flex items-center gap-2">
-            <i data-lucide="keyboard" class="w-4 h-4"></i> វាយបញ្ចូល
+            <i data-lucide="keyboard" class="w-4 h-4"></i> <?= t('manual_input_label') ?>
         </button>
     </div>
 
@@ -75,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div id="cameraSection">
         <div id="qr-reader" class="rounded-xl overflow-hidden border-2 border-dashed border-gray-200"></div>
         <p id="scannerHint" class="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1.5">
-            <i data-lucide="scan-line" class="w-3.5 h-3.5"></i> តម្រង់ QR Code ចូលក្នុងស៊ុម
+            <i data-lucide="scan-line" class="w-3.5 h-3.5"></i> <?= t('scanner_hint_label') ?>
         </p>
     </div>
 
@@ -84,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <input type="text" name="qr_data" id="qrInput" placeholder="BOOKING-1-EVENT-1" required
             class="flex-1 border border-gray-300 rounded-md px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
         <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-md hover:bg-blue-700 transition font-medium">
-            Check-in
+            <?= t('checkin_button_label') ?>
         </button>
     </form>
 
@@ -96,14 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
     <?php if ($booking): ?>
     <div class="mt-6 border-t pt-6 animate-in">
         <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-            <i data-lucide="ticket" class="w-4 h-4 text-blue-600"></i> ព័ត៌មានសំបុត្រ
+            <i data-lucide="ticket" class="w-4 h-4 text-blue-600"></i> <?= t('ticket_info_label') ?>
         </h3>
         <div class="bg-gray-50 rounded-lg p-4 space-y-1.5 text-sm">
-            <p><span class="font-medium text-gray-600">អ្នកកក់:</span> <?= htmlspecialchars($booking['customer_name']) ?></p>
-            <p><span class="font-medium text-gray-600">Event:</span> <?= htmlspecialchars($booking['title']) ?></p>
-            <p><span class="font-medium text-gray-600">ថ្ងៃ:</span> <?= date('d M Y, h:i A', strtotime($booking['event_date'])) ?></p>
-            <p><span class="font-medium text-gray-600">ចំនួនសំបុត្រ:</span> <?= $booking['quantity'] ?></p>
-            <p><span class="font-medium text-gray-600">លេខកក់:</span> #<?= $booking['id'] ?></p>
+            <p><span class="font-medium text-gray-600"><?= t('booked_by_colon_label') ?></span> <?= htmlspecialchars($booking['customer_name']) ?></p>
+            <p><span class="font-medium text-gray-600"><?= t('event_colon_label') ?></span> <?= htmlspecialchars($booking['title']) ?></p>
+            <p><span class="font-medium text-gray-600"><?= t('date_colon_label') ?></span> <?= date('d M Y, h:i A', strtotime($booking['event_date'])) ?></p>
+            <p><span class="font-medium text-gray-600"><?= t('ticket_qty_colon_label') ?></span> <?= $booking['quantity'] ?></p>
+            <p><span class="font-medium text-gray-600"><?= t('booking_number_colon_label') ?></span> #<?= $booking['id'] ?></p>
         </div>
     </div>
     <?php endif; ?>
@@ -154,11 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 240, height: 240 } },
             (decodedText) => {
-                // ការពារ Scan ដដែលៗច្រើនដង
+                // Guard against multiple repeated scans
                 if (scannerRunning) {
                     scannerRunning = false;
                     document.getElementById('scannerHint').innerHTML =
-                        '<span class="text-green-600 font-medium">✅ បានស្គាល់ QR Code! កំពុងផ្ទៀងផ្ទាត់...</span>';
+                        `<span class="text-green-600 font-medium">${jsLang.qrRecognized}</span>`;
                     html5QrCode.stop().then(() => {
                         document.getElementById('scanInput').value = decodedText;
                         document.getElementById('scanForm').submit();
@@ -168,27 +183,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             },
-            () => { /* frame មិនមាន QR — មិនបញ្ហា ធ្វើកន្លងទៅ */ }
+            () => { /* frame has no QR — not a problem, keep going */ }
         ).then(() => {
             scannerRunning = true;
         }).catch((err) => {
-            let reason = 'មិនអាចបើក Camera បានទេ';
+            let reason = jsLang.cameraUnavailable;
             const errStr = String(err);
 
             if (errStr.includes('NotFoundError') || errStr.includes('requested device not found')) {
-                reason = '⚠️ រកមិនឃើញ Camera ក្នុងឧបករណ៍នេះទេ (Desktop ភាគច្រើនគ្មាន Webcam)';
+                reason = jsLang.cameraNotFound;
             } else if (errStr.includes('NotAllowedError') || errStr.includes('Permission denied')) {
-                reason = '⚠️ Camera Permission ត្រូវបានបដិសេធ — សូមអនុញ្ញាតនៅ Browser Settings';
+                reason = jsLang.cameraPermission;
             } else if (errStr.includes('NotReadableError')) {
-                reason = '⚠️ Camera កំពុងប្រើដោយ App ផ្សេង (បិទ Zoom/OBS ។ល។ រួចសាកម្តងទៀត)';
+                reason = jsLang.cameraInUse;
             } else {
-                reason = '⚠️ មិនអាចបើក Camera បានទេ: ' + errStr;
+                reason = jsLang.cameraErrorPrefix + errStr;
             }
 
             document.getElementById('scannerHint').innerHTML = `<span class="text-red-500">${reason}</span>`;
-            showToast(reason + ' — កំពុងប្តូរទៅ "វាយបញ្ចូល"', 'error');
+            showToast(reason + ' ' + jsLang.switchingToManual, 'error');
 
-            // Auto-fallback ទៅ Manual mode
+            // Auto-fallback to Manual mode
             setTimeout(() => switchMode('manual'), 1500);
         });
     }
@@ -200,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ចាប់ផ្តើម Camera ភ្លាមៗពេលបើកទំព័រ
+    // Start camera immediately when the page opens
     document.addEventListener('DOMContentLoaded', () => {
         startScanner();
     });

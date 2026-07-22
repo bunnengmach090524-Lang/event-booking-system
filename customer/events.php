@@ -27,8 +27,8 @@ $favoritedIds = array_flip($favoritedIds);
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">🎉 Events កំពុងលក់សំបុត្រ</h1>
-        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">រកឃើញ Event ដ៏ល្អបំផុតសម្រាប់អ្នក</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">🎉 <?= t('events_title') ?></h1>
+        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1"><?= t('events_subtitle') ?></p>
     </div>
 </div>
 
@@ -37,11 +37,11 @@ $favoritedIds = array_flip($favoritedIds);
     <div class="flex gap-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-2 max-w-xl">
         <div class="flex items-center gap-2 flex-1 px-3">
             <i data-lucide="search" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
-            <input type="text" name="search" placeholder="ស្វែងរក Event ឬទីតាំង..." value="<?= htmlspecialchars($search) ?>"
+            <input type="text" name="search" placeholder="<?= t('search_placeholder') ?>" value="<?= htmlspecialchars($search) ?>"
                 class="w-full outline-none text-sm text-gray-700 dark:text-gray-200 dark:placeholder-gray-500 bg-transparent py-2">
         </div>
         <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:shadow-md transition">
-            ស្វែងរក
+            <?= t('search_btn') ?>
         </button>
     </div>
 </form>
@@ -51,7 +51,7 @@ $favoritedIds = array_flip($favoritedIds);
     <?php if (empty($events)): ?>
         <div class="col-span-3 text-center py-20">
             <i data-lucide="calendar-x" class="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4"></i>
-            <p class="text-gray-400 dark:text-gray-500">មិនទាន់មាន Event ណាទេពេលនេះ</p>
+            <p class="text-gray-400 dark:text-gray-500"><?= t('no_events') ?></p>
         </div>
     <?php endif; ?>
 
@@ -79,11 +79,11 @@ $favoritedIds = array_flip($favoritedIds);
 
             <?php if ($soldOut): ?>
                 <div class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                    សំបុត្រអស់
+                    <?= t('sold_out') ?>
                 </div>
             <?php else: ?>
                 <div class="absolute top-3 right-3 bg-white/95 dark:bg-gray-900/90 backdrop-blur text-green-600 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                    <i data-lucide="ticket" class="w-3 h-3"></i> <?= $remaining ?> នៅសល់
+                    <i data-lucide="ticket" class="w-3 h-3"></i> <?= $remaining ?> <?= t('tickets_remaining') ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -105,7 +105,7 @@ $favoritedIds = array_flip($favoritedIds);
                 <span class="text-xl font-bold text-blue-600 dark:text-blue-400">$<?= number_format($event['price'], 2) ?></span>
                 <a href="event-detail.php?id=<?= $event['id'] ?>" 
                    class="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 group-hover:bg-blue-600 group-hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-                    មើលលម្អិត <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    <?= t('view_details') ?> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </a>
             </div>
         </div>
