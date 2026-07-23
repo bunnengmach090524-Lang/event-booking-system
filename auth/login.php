@@ -14,9 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['name'] = $user['name'];
-        $_SESSION['role'] = $user['role'];
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['name'] = $user['name'];
+    $_SESSION['role'] = $user['role'];
+    $_SESSION['avatar'] = $user['avatar'] ?? null;
+    $_SESSION['preferred_theme'] = $user['preferred_theme'] ?? 'light';
 
         if ($user['role'] === 'admin') {
             redirect('/event-booking/admin/dashboard.php');

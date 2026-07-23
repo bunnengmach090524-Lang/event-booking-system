@@ -3,21 +3,18 @@ require '../config/database.php';
 require '../includes/header.php';
 
 // ===== Time Range Filter =====
-$range = $_GET['range'] ?? 'monthly'; // daily | monthly | yearly
+$range = $_GET['range'] ?? 'monthly';
 if (!in_array($range, ['daily', 'monthly', 'yearly'])) $range = 'monthly';
 
-// ===== ស្ថិតិសង្ខេប =====
 $totalEvents = $pdo->query("SELECT COUNT(*) FROM events")->fetchColumn();
 $totalBookings = $pdo->query("SELECT COUNT(*) FROM bookings")->fetchColumn();
 $totalRevenue = $pdo->query("SELECT SUM(total_price) FROM bookings WHERE status = 'paid'")->fetchColumn() ?: 0;
 $cancelledEvents = $pdo->query("SELECT COUNT(*) FROM events WHERE status = 'cancelled'")->fetchColumn();
 
-// ===== Check-in Rate =====
 $paidBookings = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'paid'")->fetchColumn();
 $checkedInBookings = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'paid' AND is_checked_in = TRUE")->fetchColumn();
 $checkinRate = $paidBookings > 0 ? round(($checkedInBookings / $paidBookings) * 100) : 0;
 
-// ===== Event ជិតដល់បំផុត =====
 $nextEvent = $pdo->query("
     SELECT title, event_date, location
     FROM events
@@ -26,7 +23,6 @@ $nextEvent = $pdo->query("
     LIMIT 1
 ")->fetch(PDO::FETCH_ASSOC);
 
-// ===== ការលក់សំបុត្រ តាម Time Range =====
 if ($range === 'daily') {
     $groupFormat = '%Y-%m-%d';
     $sinceClause = "created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)";
@@ -54,7 +50,6 @@ $chartLabels = json_encode(array_column($salesData, 'period'));
 $chartTickets = json_encode(array_column($salesData, 'tickets_sold'));
 $chartRevenue = json_encode(array_column($salesData, 'revenue'));
 
-// ===== Top 5 Events លក់ដាច់បំផុត =====
 $topEvents = $pdo->query("
     SELECT title, tickets_sold, total_tickets
     FROM events
@@ -62,7 +57,6 @@ $topEvents = $pdo->query("
     LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// ===== Top 5 ទីតាំង Events ច្រើនបំផុត =====
 $topLocations = $pdo->query("
     SELECT location, COUNT(*) as total_events, SUM(tickets_sold) as total_tickets_sold
     FROM events
@@ -71,7 +65,6 @@ $topLocations = $pdo->query("
     LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// ===== Events by Category =====
 $categoryData = $pdo->query("
     SELECT category, COUNT(*) as total
     FROM events
@@ -89,10 +82,10 @@ $stats = [
     ['label' => t('stat_cancelled_events'), 'value' => $cancelledEvents, 'icon' => 'circle-slash', 'color' => 'red'],
 ];
 $colorMap = [
-    'blue'   => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'ring' => 'group-hover:ring-blue-100'],
-    'green'  => ['bg' => 'bg-green-50', 'text' => 'text-green-600', 'ring' => 'group-hover:ring-green-100'],
-    'purple' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-600', 'ring' => 'group-hover:ring-purple-100'],
-    'red'    => ['bg' => 'bg-red-50', 'text' => 'text-red-600', 'ring' => 'group-hover:ring-red-100'],
+    'blue'   => ['bg' => 'bg-blue-50 dark:bg-blue-900/30', 'text' => 'text-blue-600 dark:text-blue-400', 'ring' => 'group-hover:ring-blue-100 dark:group-hover:ring-blue-900'],
+    'green'  => ['bg' => 'bg-green-50 dark:bg-green-900/30', 'text' => 'text-green-600 dark:text-green-400', 'ring' => 'group-hover:ring-green-100 dark:group-hover:ring-green-900'],
+    'purple' => ['bg' => 'bg-purple-50 dark:bg-purple-900/30', 'text' => 'text-purple-600 dark:text-purple-400', 'ring' => 'group-hover:ring-purple-100 dark:group-hover:ring-purple-900'],
+    'red'    => ['bg' => 'bg-red-50 dark:bg-red-900/30', 'text' => 'text-red-600 dark:text-red-400', 'ring' => 'group-hover:ring-red-100 dark:group-hover:ring-red-900'],
 ];
 $medals = ['🥇', '🥈', '🥉'];
 $categoryColors = ['#3b82f6', '#a855f7', '#f97316', '#22c55e', '#ec4899', '#14b8a6'];
@@ -101,26 +94,26 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
 
 <div class="mb-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">📊 <?= t('dashboard_label') ?></h1>
-        <p class="text-gray-400 text-sm mt-1"><?= t('dashboard_welcome') ?>, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?> 👋</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">📊 <?= t('dashboard_label') ?></h1>
+        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1"><?= t('dashboard_welcome') ?>, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?> 👋</p>
     </div>
     <a href="export-bookings.php" 
-       class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:shadow-sm transition-all">
-        <i data-lucide="download" class="w-4 h-4 text-green-600"></i> <?= t('download_csv_label') ?>
+       class="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all">
+        <i data-lucide="download" class="w-4 h-4 text-green-600 dark:text-green-400"></i> <?= t('download_csv_label') ?>
     </a>
 </div>
 
 <!-- Stat Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
     <?php foreach ($stats as $i => $s): $c = $colorMap[$s['color']]; ?>
-    <div class="animate-in delay-<?= $i + 1 ?> group bg-white p-5 rounded-2xl shadow-sm border border-gray-100 ring-1 ring-transparent <?= $c['ring'] ?> hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+    <div class="animate-in delay-<?= $i + 1 ?> group bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 ring-1 ring-transparent <?= $c['ring'] ?> hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
         <div class="flex items-center justify-between mb-4">
             <div class="w-11 h-11 <?= $c['bg'] ?> rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <i data-lucide="<?= $s['icon'] ?>" class="w-5 h-5 <?= $c['text'] ?>"></i>
             </div>
         </div>
-        <p class="text-gray-400 text-xs font-medium mb-1"><?= $s['label'] ?></p>
-        <p class="text-2xl font-bold text-gray-800"><?= $s['value'] ?></p>
+        <p class="text-gray-400 dark:text-gray-500 text-xs font-medium mb-1"><?= $s['label'] ?></p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?= $s['value'] ?></p>
     </div>
     <?php endforeach; ?>
 </div>
@@ -145,10 +138,10 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
     </div>
 
     <!-- Check-in Rate Ring -->
-    <div class="animate-in delay-3 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-center justify-center text-center">
+    <div class="animate-in delay-3 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-center justify-center text-center">
         <div class="relative w-24 h-24 mb-3">
             <svg class="w-24 h-24 -rotate-90">
-                <circle cx="48" cy="48" r="40" stroke="#f1f5f9" stroke-width="10" fill="none" />
+                <circle cx="48" cy="48" r="40" stroke="#f1f5f9" stroke-width="10" fill="none" class="dark:stroke-gray-700" />
                 <circle cx="48" cy="48" r="40" stroke="url(#ringGradient)" stroke-width="10" fill="none"
                         stroke-linecap="round"
                         stroke-dasharray="<?= 251.2 ?>"
@@ -162,42 +155,41 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                 </defs>
             </svg>
             <div class="absolute inset-0 flex items-center justify-center">
-                <span class="text-xl font-bold text-gray-800"><?= $checkinRate ?>%</span>
+                <span class="text-xl font-bold text-gray-800 dark:text-gray-100"><?= $checkinRate ?>%</span>
             </div>
         </div>
-        <p class="font-semibold text-gray-700 text-sm"><?= t('checkin_rate_label') ?></p>
-        <p class="text-gray-400 text-xs mt-0.5"><?= $checkedInBookings ?>/<?= $paidBookings ?> <?= t('tickets_unit') ?></p>
+        <p class="font-semibold text-gray-700 dark:text-gray-200 text-sm"><?= t('checkin_rate_label') ?></p>
+        <p class="text-gray-400 dark:text-gray-500 text-xs mt-0.5"><?= $checkedInBookings ?>/<?= $paidBookings ?> <?= t('tickets_unit') ?></p>
     </div>
 </div>
 
 <!-- Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-    <!-- Bar Chart: ការលក់តាមរយៈពេល -->
-    <div class="lg:col-span-2 animate-in delay-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+    <div class="lg:col-span-2 animate-in delay-4 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h3 class="font-semibold text-gray-700 flex items-center gap-2">
-                <i data-lucide="trending-up" class="w-4.5 h-4.5 text-blue-600"></i> <?= t('ticket_sales_label') ?>
+            <h3 class="font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4.5 h-4.5 text-blue-600 dark:text-blue-400"></i> <?= t('ticket_sales_label') ?>
             </h3>
-            <div class="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-                <a href="?range=daily" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'daily' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('daily_label') ?></a>
-                <a href="?range=monthly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'monthly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('monthly_label') ?></a>
-                <a href="?range=yearly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'yearly' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700' ?>"><?= t('yearly_label') ?></a>
+            <div class="flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg w-fit">
+                <a href="?range=daily" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'daily' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' ?>"><?= t('daily_label') ?></a>
+                <a href="?range=monthly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'monthly' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' ?>"><?= t('monthly_label') ?></a>
+                <a href="?range=yearly" class="px-3 py-1.5 rounded-md text-xs font-semibold transition <?= $range === 'yearly' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' ?>"><?= t('yearly_label') ?></a>
             </div>
         </div>
         <?php if (empty($salesData)): ?>
-            <p class="text-gray-400 text-sm text-center py-12"><?= t('no_sales_data_label') ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm text-center py-12"><?= t('no_sales_data_label') ?></p>
         <?php else: ?>
             <canvas id="salesChart"></canvas>
         <?php endif; ?>
     </div>
 
     <!-- Category Donut -->
-    <div class="animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <i data-lucide="pie-chart" class="w-4.5 h-4.5 text-purple-600"></i> <?= t('events_by_category_label') ?>
+    <div class="animate-in delay-5 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
+        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
+            <i data-lucide="pie-chart" class="w-4.5 h-4.5 text-purple-600 dark:text-purple-400"></i> <?= t('events_by_category_label') ?>
         </h3>
         <?php if (empty($categoryData)): ?>
-            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <canvas id="categoryChart"></canvas>
         <?php endif; ?>
@@ -206,12 +198,12 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
 
 <!-- Top Events + Top Locations -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
-    <div class="lg:col-span-2 animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+    <div class="lg:col-span-2 animate-in delay-5 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
+        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
             <i data-lucide="trophy" class="w-4.5 h-4.5 text-amber-500"></i> <?= t('best_selling_events_label') ?>
         </h3>
         <?php if (empty($topEvents)): ?>
-            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 <?php foreach ($topEvents as $i => $e):
@@ -219,13 +211,13 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                 ?>
                 <div class="group">
                     <div class="flex justify-between text-sm mb-1.5 items-center">
-                        <span class="font-medium text-gray-700 flex items-center gap-2">
+                        <span class="font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
                             <span class="text-base w-5 text-center"><?= $medals[$i] ?? ($i + 1) . '.' ?></span>
                             <span class="line-clamp-1"><?= htmlspecialchars($e['title']) ?></span>
                         </span>
-                        <span class="text-gray-400 text-xs flex-shrink-0"><?= $e['tickets_sold'] ?>/<?= $e['total_tickets'] ?></span>
+                        <span class="text-gray-400 dark:text-gray-500 text-xs flex-shrink-0"><?= $e['tickets_sold'] ?>/<?= $e['total_tickets'] ?></span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                         <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-700 ease-out"
                              style="width: <?= min($percent, 100) ?>%"></div>
                     </div>
@@ -236,12 +228,12 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
     </div>
 
     <!-- Top Locations -->
-    <div class="animate-in delay-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-        <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+    <div class="animate-in delay-5 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
+        <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
             <i data-lucide="map-pin" class="w-4.5 h-4.5 text-rose-500"></i> <?= t('popular_locations_label') ?>
         </h3>
         <?php if (empty($topLocations)): ?>
-            <p class="text-gray-400 text-sm"><?= t('no_data_label') ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm"><?= t('no_data_label') ?></p>
         <?php else: ?>
             <div class="space-y-4">
                 <?php foreach ($topLocations as $i => $loc):
@@ -249,13 +241,13 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
                 ?>
                 <div>
                     <div class="flex justify-between text-sm mb-1.5 items-center gap-2">
-                        <span class="font-medium text-gray-700 flex items-center gap-2 min-w-0">
+                        <span class="font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2 min-w-0">
                             <span class="text-base w-5 text-center flex-shrink-0"><?= $medals[$i] ?? ($i + 1) . '.' ?></span>
                             <span class="line-clamp-1"><?= htmlspecialchars($loc['location']) ?></span>
                         </span>
-                        <span class="text-gray-400 text-xs flex-shrink-0"><?= $loc['total_events'] ?> <?= t('events_label') ?></span>
+                        <span class="text-gray-400 dark:text-gray-500 text-xs flex-shrink-0"><?= $loc['total_events'] ?> <?= t('events_label') ?></span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                         <div class="bg-gradient-to-r from-rose-500 to-orange-400 h-2 rounded-full transition-all duration-700 ease-out"
                              style="width: <?= min($locPercent, 100) ?>%"></div>
                     </div>
@@ -268,6 +260,10 @@ $maxLocationCount = !empty($topLocations) ? max(array_column($topLocations, 'tot
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
+const isDarkMode = document.documentElement.classList.contains('dark');
+const chartTextColor = isDarkMode ? '#9ca3af' : '#6b7280';
+const chartGridColor = isDarkMode ? '#374151' : '#f1f5f9';
+
 <?php if (!empty($salesData)): ?>
 new Chart(document.getElementById('salesChart').getContext('2d'), {
     type: 'bar',
@@ -293,11 +289,11 @@ new Chart(document.getElementById('salesChart').getContext('2d'), {
     options: {
         responsive: true,
         animation: { duration: 800, easing: 'easeOutQuart' },
-        plugins: { legend: { labels: { font: { family: 'Poppins' } } } },
+        plugins: { legend: { labels: { font: { family: 'Poppins' }, color: chartTextColor } } },
         scales: {
-            y: { type: 'linear', position: 'left', beginAtZero: true, grid: { color: '#f1f5f9' } },
-            y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false } },
-            x: { grid: { display: false } }
+            y: { type: 'linear', position: 'left', beginAtZero: true, grid: { color: chartGridColor }, ticks: { color: chartTextColor } },
+            y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { color: chartTextColor } },
+            x: { grid: { display: false }, ticks: { color: chartTextColor } }
         }
     }
 });
@@ -312,14 +308,14 @@ new Chart(document.getElementById('categoryChart').getContext('2d'), {
             data: <?= $categoryValues ?>,
             backgroundColor: <?= json_encode($categoryColors) ?>,
             borderWidth: 2,
-            borderColor: '#fff',
+            borderColor: isDarkMode ? '#1f2937' : '#fff',
         }]
     },
     options: {
         responsive: true,
         animation: { duration: 800, easing: 'easeOutQuart' },
         plugins: {
-            legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, boxWidth: 12, padding: 12 } }
+            legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, boxWidth: 12, padding: 12, color: chartTextColor } }
         },
         cutout: '65%'
     }

@@ -6,6 +6,7 @@ require_once __DIR__ . '/lang.php';
 $currentPage = basename($_SERVER['PHP_SELF']);
 $currentDir = basename(dirname($_SERVER['PHP_SELF']));
 
+
 // ===== Sidebar: Badge Counts =====
 $activeEventsCount = $pdo->query("SELECT COUNT(*) FROM events WHERE status = 'active' AND event_date >= NOW()")->fetchColumn();
 $pendingCheckinCount = $pdo->query("SELECT COUNT(*) FROM bookings WHERE status = 'paid' AND is_checked_in = FALSE")->fetchColumn();
@@ -23,14 +24,34 @@ $sidebarUpcomingEvents = $pdo->query("
     ORDER BY event_date ASC
     LIMIT 5
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+$siteLogo = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'logo'")->fetchColumn();
+$siteName = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'site_name'")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($currentLang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        <?php $dbTheme = $_SESSION['theme'] ?? null; ?>
+        <?php if ($dbTheme === 'dark'): ?>
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+        <?php elseif ($dbTheme === 'light'): ?>
+            localStorage.theme = 'light';
+        <?php else: ?>
+            if (localStorage.theme === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        <?php endif; ?>
+    </script>
     <title>Admin - Event Booking</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <script>
+    tailwind.config = { darkMode: 'class' }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -73,7 +94,7 @@ $sidebarUpcomingEvents = $pdo->query("
         .badge-pulse { animation: pulseBadge 2s infinite; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
 
 <div class="flex h-screen overflow-hidden">
 
@@ -83,11 +104,15 @@ $sidebarUpcomingEvents = $pdo->query("
         <!-- Logo + Collapse Toggle -->
         <div class="flex items-center justify-between px-6 py-6">
             <div class="flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-900/40 flex-shrink-0">
-                    <i data-lucide="ticket" class="w-5 h-5 text-white"></i>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-900/40 flex-shrink-0 overflow-hidden">
+                    <?php if (!empty($siteLogo)): ?>
+                        <img src="/event-booking/uploads/settings/<?= htmlspecialchars($siteLogo) ?>" class="w-full h-full object-contain p-1">
+                    <?php else: ?>
+                        <i data-lucide="ticket" class="w-5 h-5 text-white"></i>
+                    <?php endif; ?>
                 </div>
                 <div class="sidebar-text min-w-0">
-                    <p class="font-bold text-lg leading-none truncate">EventPlace</p>
+                    <p class="font-bold text-lg leading-none truncate"><?= htmlspecialchars($siteName ?: 'EventPlace') ?></p>
                     <p class="text-[11px] text-indigo-300 mt-1 tracking-wide uppercase truncate"><?= t('admin_panel_label') ?></p>
                 </div>
             </div>
@@ -216,8 +241,12 @@ $sidebarUpcomingEvents = $pdo->query("
         <!-- User Footer -->
         <div class="px-4 py-5 border-t border-white/10">
             <div class="flex items-center gap-3 px-2">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold flex-shrink-0">
-                    <?= mb_strtoupper(mb_substr($_SESSION['name'] ?? 'A', 0, 1, 'UTF-8'), 'UTF-8') ?>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden">
+                    <?php if (!empty($_SESSION['avatar'])): ?>
+                        <img src="/event-booking/uploads/avatars/<?= htmlspecialchars($_SESSION['avatar']) ?>" class="w-full h-full object-cover">
+                    <?php else: ?>
+                        <?= mb_strtoupper(mb_substr($_SESSION['name'] ?? 'A', 0, 1, 'UTF-8'), 'UTF-8') ?>
+                    <?php endif; ?>
                 </div>
                 <div class="sidebar-text flex-1 min-w-0">
                     <p class="text-sm font-semibold truncate"><?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?></p>
@@ -235,22 +264,22 @@ $sidebarUpcomingEvents = $pdo->query("
 
     <!-- Main -->
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="bg-white/80 backdrop-blur border-b border-gray-100 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-20">
-            <button id="menuBtn" class="lg:hidden text-gray-600 p-2 -ml-2">
+        <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur border-b border-gray-100 dark:border-gray-700 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-20">
+            <button id="menuBtn" class="lg:hidden text-gray-600 dark:text-gray-300 p-2 -ml-2">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
-            <div class="hidden lg:block text-sm text-gray-400">
+            <div class="hidden lg:block text-sm text-gray-400 dark:text-gray-500">
                 <?= date('l, d F Y') ?>
             </div>
             <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 bg-green-50 px-3 py-1.5 rounded-full">
+                <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-full">
                     <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
                     <?= t('system_online_label') ?>
                 </div>
 
                 <!-- Theme Toggle -->
                 <button id="themeToggle" title="<?= t('theme_toggle_label') ?>"
-                    class="text-gray-500 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl transition-all">
+                    class="text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 p-2.5 rounded-xl transition-all">
                     <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
                     <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
                 </button>
@@ -258,33 +287,33 @@ $sidebarUpcomingEvents = $pdo->query("
                 <!-- Notifications -->
                 <div class="relative">
                     <button id="notificationsBtn" title="<?= t('notifications_label') ?>"
-                        class="relative text-gray-500 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 p-2.5 rounded-xl transition-all">
+                        class="relative text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 p-2.5 rounded-xl transition-all">
                         <i data-lucide="bell" class="w-4 h-4"></i>
                         <span id="notificationsCount" hidden
                             class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4.5 h-4.5 min-w-[18px] px-1 rounded-full flex items-center justify-center">0</span>
                     </button>
                     <div id="notificationsDropdown" hidden
-                        class="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden z-30 max-h-80 overflow-y-auto">
-                        <p class="px-4 py-2 text-gray-400 text-xs"><?= t('loading_label') ?></p>
+                        class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-30 max-h-80 overflow-y-auto">
+                        <p class="px-4 py-2 text-gray-400 dark:text-gray-500 text-xs"><?= t('loading_label') ?></p>
                     </div>
                 </div>
 
                 <!-- Language Switcher -->
                 <div class="relative">
                     <button id="langBtn" onclick="toggleLangMenu()"
-                        class="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-100 border border-gray-200 px-3 py-2 rounded-xl text-xs font-semibold transition-all">
+                        class="flex items-center gap-1.5 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 py-2 rounded-xl text-xs font-semibold transition-all">
                         <i data-lucide="globe" class="w-4 h-4"></i>
                         <span class="uppercase"><?= htmlspecialchars($currentLang) ?></span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
                     </button>
-                    <div id="langMenu" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden z-30">
+                    <div id="langMenu" class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-30">
                         <a href="/event-booking/includes/lang.php?set=en"
-                           class="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition <?= $currentLang === 'en' ? 'text-blue-600 font-semibold' : 'text-gray-600' ?>">
+                        class="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition <?= $currentLang === 'en' ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300' ?>">
                             English
                             <?php if ($currentLang === 'en'): ?><i data-lucide="check" class="w-4 h-4"></i><?php endif; ?>
                         </a>
                         <a href="/event-booking/includes/lang.php?set=km"
-                           class="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition <?= $currentLang === 'km' ? 'text-blue-600 font-semibold' : 'text-gray-600' ?>">
+                        class="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition <?= $currentLang === 'km' ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300' ?>">
                             ខ្មែរ
                             <?php if ($currentLang === 'km'): ?><i data-lucide="check" class="w-4 h-4"></i><?php endif; ?>
                         </a>
@@ -294,27 +323,31 @@ $sidebarUpcomingEvents = $pdo->query("
                 <!-- Profile Dropdown -->
                 <div class="relative">
                     <button id="profileBtn" onclick="toggleProfileMenu()"
-                        class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-gray-100 border border-transparent hover:border-gray-200 transition-all">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                            <?= mb_strtoupper(mb_substr($_SESSION['name'] ?? 'A', 0, 1, 'UTF-8'), 'UTF-8') ?>
+                        class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-all">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                            <?php if (!empty($_SESSION['avatar'])): ?>
+                                <img src="/event-booking/uploads/avatars/<?= htmlspecialchars($_SESSION['avatar']) ?>" class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <?= mb_strtoupper(mb_substr($_SESSION['name'] ?? 'A', 0, 1, 'UTF-8'), 'UTF-8') ?>
+                            <?php endif; ?>
                         </div>
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-500 hidden sm:block"></i>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hidden sm:block"></i>
                     </button>
-                    <div id="profileMenu" class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden z-30">
-                        <div class="px-4 py-3 border-b border-gray-50">
-                            <p class="text-sm font-semibold text-gray-800 truncate"><?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?></p>
-                            <p class="text-xs text-gray-400"><?= t('administrator_label') ?></p>
+                    <div id="profileMenu" class="hidden absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-30">
+                        <div class="px-4 py-3 border-b border-gray-50 dark:border-gray-700">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate"><?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?></p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500"><?= t('administrator_label') ?></p>
                         </div>
                         <a href="/event-booking/admin/profile.php"
-                           class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition">
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <i data-lucide="user" class="w-4 h-4"></i> <?= t('my_profile_label') ?>
                         </a>
                         <a href="/event-booking/admin/settings.php"
-                           class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition">
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <i data-lucide="settings" class="w-4 h-4"></i> <?= t('account_settings_label') ?>
                         </a>
                         <a href="/event-booking/auth/logout.php"
-                           class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition border-t border-gray-50">
+                        class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition border-t border-gray-50 dark:border-gray-700">
                             <i data-lucide="log-out" class="w-4 h-4"></i> <?= t('logout_label') ?>
                         </a>
                     </div>

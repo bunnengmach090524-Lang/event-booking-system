@@ -42,13 +42,20 @@ $categoryIcons = [
     'Concert' => '🎵', 'Conference' => '💼', 'Workshop' => '🛠️',
     'Sports' => '⚽', 'Exhibition' => '🎨', 'General' => '📌'
 ];
+
+// ===== Site branding (logo + name), same source as admin dashboard =====
+$siteLogo = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'logo'")->fetchColumn();
+$siteName = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'site_name'")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Booking System</title>
+    <title><?= htmlspecialchars($siteName ?: 'EventPlace') ?></title>
+    <?php if (!empty($siteLogo)): ?>
+        <link rel="icon" type="image/jpeg" href="/event-booking/uploads/settings/<?= htmlspecialchars($siteLogo) ?>">
+    <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' };</script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -81,10 +88,14 @@ $categoryIcons = [
 <!-- Navbar -->
 <nav class="bg-white/80 dark:bg-gray-800/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50">
     <div class="flex items-center gap-2 font-bold text-xl text-gray-800 dark:text-white">
-        <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <i data-lucide="ticket" class="w-5 h-5 text-white"></i>
+        <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+            <?php if (!empty($siteLogo)): ?>
+                <img src="/event-booking/uploads/settings/<?= htmlspecialchars($siteLogo) ?>" class="w-full h-full object-contain p-1">
+            <?php else: ?>
+                <i data-lucide="ticket" class="w-5 h-5 text-white"></i>
+            <?php endif; ?>
         </div>
-        EventPlace
+        <?= htmlspecialchars($siteName ?: 'EventPlace') ?>
     </div>
 
     <div class="hidden md:flex gap-8 text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -352,7 +363,14 @@ $categoryIcons = [
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
         <div>
             <div class="flex items-center gap-2 text-white font-bold text-lg mb-4">
-                <i data-lucide="ticket" class="w-5 h-5"></i> EventPlace
+                <div class="w-6 h-6 flex-shrink-0 overflow-hidden rounded flex items-center justify-center">
+                    <?php if (!empty($siteLogo)): ?>
+                        <img src="/event-booking/uploads/settings/<?= htmlspecialchars($siteLogo) ?>" class="w-full h-full object-contain">
+                    <?php else: ?>
+                        <i data-lucide="ticket" class="w-5 h-5"></i>
+                    <?php endif; ?>
+                </div>
+                <?= htmlspecialchars($siteName ?: 'EventPlace') ?>
             </div>
             <p class="text-sm leading-relaxed"><?= t('footer_tagline') ?></p>
         </div>

@@ -3,12 +3,18 @@ require '../../config/database.php';
 require '../../includes/functions.php';
 requireAdmin();
 
-$id = $_GET['id'] ?? null;
-$status = $_GET['status'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    redirect('/event-booking/admin/bookings/index.php');
+}
+
+csrfCheck();
+
+$id = (int)($_POST['id'] ?? 0);
+$status = $_POST['status'] ?? null;
 
 $allowedStatuses = ['paid', 'pending', 'refunded', 'cancelled'];
 
-if ($id && in_array($status, $allowedStatuses)) {
+if ($id && in_array($status, $allowedStatuses, true)) {
     $stmt = $pdo->prepare("UPDATE bookings SET status = ? WHERE id = ?");
     $stmt->execute([$status, $id]);
     logActivity($pdo, 'update_booking_status', "បានប្តូរ Booking #$id ទៅជា " . ucfirst($status));
@@ -18,4 +24,3 @@ if ($id && in_array($status, $allowedStatuses)) {
 }
 
 redirect('/event-booking/admin/bookings/index.php');
-?>

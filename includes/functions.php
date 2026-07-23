@@ -1,8 +1,10 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+    return isset($_SESSION['user_id']); 
 }
 
 // កែប្រែ: admin OR super_admin ទាំងពីរអាចចូល Admin Panel បាន
@@ -14,6 +16,7 @@ function isAdmin() {
 function isSuperAdmin(): bool {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'super_admin';
 }
+
 
 function redirect($url) {
     header("Location: $url");

@@ -25,82 +25,82 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalSpent = array_sum(array_map(fn($b) => $b['status'] === 'paid' ? $b['total_price'] : 0, $bookings));
 
 $statusBadge = [
-    'paid'      => 'bg-green-100 text-green-700',
-    'pending'   => 'bg-yellow-100 text-yellow-700',
-    'refunded'  => 'bg-gray-100 text-gray-600',
-    'cancelled' => 'bg-red-100 text-red-700',
+    'paid'      => 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400',
+    'pending'   => 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400',
+    'refunded'  => 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+    'cancelled' => 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400',
 ];
 ?>
 
-<a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 mb-5 transition">
+<a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-5 transition">
     <i data-lucide="arrow-left" class="w-4 h-4"></i> ត្រឡប់ទៅ Customers
 </a>
 
 <!-- Profile Card -->
-<div class="animate-in bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center gap-5">
+<div class="animate-in bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm mb-6 flex flex-col sm:flex-row sm:items-center gap-5">
     <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
         <?= mb_strtoupper(mb_substr($customer['name'], 0, 1, 'UTF-8'), 'UTF-8') ?>
     </div>
     <div class="flex-1 min-w-0">
-        <h1 class="text-xl font-bold text-gray-800"><?= htmlspecialchars($customer['name']) ?></h1>
-        <p class="text-gray-400 text-sm"><?= htmlspecialchars($customer['email']) ?></p>
-        <p class="text-gray-300 text-xs mt-1">ចូលរួមតាំងពី <?= date('d M Y', strtotime($customer['created_at'])) ?></p>
+        <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100"><?= htmlspecialchars($customer['name']) ?></h1>
+        <p class="text-gray-400 dark:text-gray-500 text-sm"><?= htmlspecialchars($customer['email']) ?></p>
+        <p class="text-gray-300 dark:text-gray-600 text-xs mt-1">ចូលរួមតាំងពី <?= date('d M Y', strtotime($customer['created_at'])) ?></p>
     </div>
-    <div class="flex gap-6 sm:border-l sm:pl-6 border-gray-100">
+    <div class="flex gap-6 sm:border-l sm:pl-6 border-gray-100 dark:border-gray-700">
         <div>
-            <p class="text-gray-400 text-xs">Bookings</p>
-            <p class="text-xl font-bold text-gray-800"><?= count($bookings) ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs">Bookings</p>
+            <p class="text-xl font-bold text-gray-800 dark:text-gray-100"><?= count($bookings) ?></p>
         </div>
         <div>
-            <p class="text-gray-400 text-xs">Total Spent</p>
-            <p class="text-xl font-bold text-blue-600">$<?= number_format($totalSpent, 2) ?></p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs">Total Spent</p>
+            <p class="text-xl font-bold text-blue-600 dark:text-blue-400">$<?= number_format($totalSpent, 2) ?></p>
         </div>
     </div>
 </div>
 
 <!-- Booking History -->
-<div class="animate-in delay-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100">
-        <h3 class="font-semibold text-gray-700">📜 ប្រវត្តិ Booking</h3>
+<div class="animate-in delay-1 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+        <h3 class="font-semibold text-gray-700 dark:text-gray-200">📜 ប្រវត្តិ Booking</h3>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left">
-            <thead class="bg-gray-50 border-b border-gray-100">
+            <thead class="bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
                 <tr>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">ID</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">Event</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">ទីតាំង</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">ចំនួន</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">តម្លៃ</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">Status</th>
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500">កាលបរិច្ឆេទកក់</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">ID</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Event</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">ទីតាំង</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">ចំនួន</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">តម្លៃ</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Status</th>
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">កាលបរិច្ឆេទកក់</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($bookings)): ?>
-                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-400">មិនទាន់មាន Booking ទេ</td></tr>
+                <tr><td colspan="7" class="px-6 py-10 text-center text-gray-400 dark:text-gray-500">មិនទាន់មាន Booking ទេ</td></tr>
                 <?php endif; ?>
                 <?php foreach ($bookings as $b): ?>
-                <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition">
-                    <td class="px-6 py-3.5 text-sm text-gray-500">#<?= $b['id'] ?></td>
+                <tr class="border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50/70 dark:hover:bg-gray-700/50 transition">
+                    <td class="px-6 py-3.5 text-sm text-gray-500 dark:text-gray-400">#<?= $b['id'] ?></td>
                     <td class="px-6 py-3.5">
-                        <p class="text-sm text-gray-700"><?= htmlspecialchars($b['event_title']) ?></p>
-                        <p class="text-xs text-gray-400"><?= date('d M Y', strtotime($b['event_date'])) ?></p>
+                        <p class="text-sm text-gray-700 dark:text-gray-300"><?= htmlspecialchars($b['event_title']) ?></p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500"><?= date('d M Y', strtotime($b['event_date'])) ?></p>
                     </td>
-                    <td class="px-6 py-3.5 text-sm text-gray-600">
+                    <td class="px-6 py-3.5 text-sm text-gray-600 dark:text-gray-300">
                         <span class="inline-flex items-center gap-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400"></i>
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"></i>
                             <?= htmlspecialchars($b['event_location']) ?>
                         </span>
                     </td>
-                    <td class="px-6 py-3.5 text-sm text-gray-600"><?= $b['quantity'] ?></td>
-                    <td class="px-6 py-3.5 text-sm font-semibold text-gray-800">$<?= number_format($b['total_price'], 2) ?></td>
+                    <td class="px-6 py-3.5 text-sm text-gray-600 dark:text-gray-300"><?= $b['quantity'] ?></td>
+                    <td class="px-6 py-3.5 text-sm font-semibold text-gray-800 dark:text-gray-100">$<?= number_format($b['total_price'], 2) ?></td>
                     <td class="px-6 py-3.5">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full <?= $statusBadge[$b['status']] ?? 'bg-gray-100 text-gray-600' ?>">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full <?= $statusBadge[$b['status']] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' ?>">
                             <?= htmlspecialchars(ucfirst($b['status'])) ?>
                         </span>
                     </td>
-                    <td class="px-6 py-3.5 text-sm text-gray-500"><?= date('d M Y, h:i A', strtotime($b['created_at'])) ?></td>
+                    <td class="px-6 py-3.5 text-sm text-gray-500 dark:text-gray-400"><?= date('d M Y, h:i A', strtotime($b['created_at'])) ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
