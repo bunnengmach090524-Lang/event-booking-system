@@ -5,7 +5,6 @@ requireAdmin();
 
 $error = '';
 
-// Icon set: key => SVG path data (Lucide-style, 24x24 viewBox, stroke-based)
 $iconSet = [
     'music'    => '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
     'briefcase'=> '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
@@ -30,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrfCheck();
 
     $name = trim($_POST['name'] ?? '');
+    $name_km = trim($_POST['name_km'] ?? '');
     $icon = trim($_POST['icon'] ?? 'pin');
 
     if ($name === '') {
@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($error === '') {
-        $stmt = $pdo->prepare("INSERT INTO categories (name, icon) VALUES (?, ?)");
-        $stmt->execute([$name, $icon]);
+        $stmt = $pdo->prepare("INSERT INTO categories (name, name_km, icon) VALUES (?, ?, ?)");
+        $stmt->execute([$name, $name_km !== '' ? $name_km : null, $icon]);
 
         $_SESSION['success'] = t('success_category_created');
         redirect('/event-booking/admin/categories/index.php');
@@ -70,7 +70,6 @@ require_once '../../includes/header.php';
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Form (2/3 width) -->
     <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
@@ -92,6 +91,15 @@ require_once '../../includes/header.php';
                         <span id="iconInputDisplay"><?= renderIcon($icon ?? 'pin', $iconSet, 'w-5 h-5') ?></span>
                     </div>
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"><?= t('category_name_km_label') ?></label>
+                <input type="text" name="name_km" id="nameKmInput" maxlength="100"
+                    value="<?= isset($name_km) ? htmlspecialchars($name_km) : '' ?>"
+                    placeholder="<?= htmlspecialchars(t('category_name_km_placeholder')) ?>"
+                    class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1"><?= t('optional_translation_hint') ?></p>
             </div>
 
             <!-- Icon picker -->
@@ -121,7 +129,6 @@ require_once '../../includes/header.php';
         </form>
     </div>
 
-    <!-- Live Preview (1/3 width) -->
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center text-center">
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4"><?= t('preview_label') ?></p>
         <div id="previewCircle" class="w-16 h-16 flex items-center justify-center bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 rounded-full mb-3 transition-transform hover:scale-105">
@@ -133,7 +140,6 @@ require_once '../../includes/header.php';
 
 </div>
 
-<!-- Hidden template storage for JS to reuse each icon's SVG -->
 <div id="iconTemplates" class="hidden">
     <?php foreach ($iconSet as $key => $svgPath): ?>
         <span data-key="<?= $key ?>"><?= renderIcon($key, $iconSet, 'w-7 h-7') ?></span>

@@ -50,11 +50,40 @@ require 'header.php';
         <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-4"><?= htmlspecialchars($event['title']) ?></h1>
         
         <div class="flex flex-wrap gap-4 text-gray-500 dark:text-gray-400 mb-6">
-            <span>📍 <?= htmlspecialchars($event['location']) ?></span>
+            <span class="flex items-center gap-1.5">
+                📍 <?= htmlspecialchars($event['location']) ?>
+                <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($event['location']) ?>"
+                   target="_blank" rel="noopener noreferrer"
+                   class="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+                    (<?= t('view_on_map_label') ?>)
+                </a>
+            </span>
             <span>📅 <?= date('d M Y, h:i A', strtotime($event['event_date'])) ?></span>
         </div>
 
         <p class="text-gray-700 dark:text-gray-300 mb-6"><?= nl2br(htmlspecialchars($event['description'])) ?></p>
+
+        <!-- Location map preview — click opens full Google Maps -->
+        <div class="mb-6">
+            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> <?= t('event_location_map_label') ?>
+            </p>
+            <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($event['location']) ?>"
+               target="_blank" rel="noopener noreferrer"
+               class="block relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 group">
+                <iframe
+                    src="https://www.google.com/maps?q=<?= urlencode($event['location']) ?>&output=embed"
+                    class="w-full h-56 pointer-events-none"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i> <?= t('view_full_map_label') ?>
+                    </span>
+                </div>
+            </a>
+        </div>
 
         <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
             <div class="flex justify-between items-center mb-4">

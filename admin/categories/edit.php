@@ -15,6 +15,7 @@ if (!$category) {
 
 $error = '';
 $name = $_POST['name'] ?? $category['name'];
+$name_km = $_POST['name_km'] ?? ($category['name_km'] ?? '');
 $icon = $_POST['icon'] ?? $category['icon'];
 if (!array_key_exists($icon, $iconSet)) {
     $icon = 'pin';
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrfCheck();
 
     $name = trim($_POST['name'] ?? '');
+    $name_km = trim($_POST['name_km'] ?? '');
     $icon = trim($_POST['icon'] ?? 'pin');
 
     if ($name === '') {
@@ -43,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($error === '') {
         $oldName = $category['name'];
 
-        $stmt = $pdo->prepare("UPDATE categories SET name = ?, icon = ? WHERE id = ?");
-        $stmt->execute([$name, $icon, $id]);
+        $stmt = $pdo->prepare("UPDATE categories SET name = ?, name_km = ?, icon = ? WHERE id = ?");
+        $stmt->execute([$name, $name_km !== '' ? $name_km : null, $icon, $id]);
 
         if ($name !== $oldName) {
             $stmt = $pdo->prepare("UPDATE events SET category = ? WHERE category = ?");
@@ -71,7 +73,6 @@ require_once '../../includes/header.php';
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Form (2/3 width) -->
     <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
@@ -92,6 +93,15 @@ require_once '../../includes/header.php';
                         <span id="iconInputDisplay"><?= renderIcon($icon, $iconSet, 'w-5 h-5') ?></span>
                     </div>
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"><?= t('category_name_km_label') ?></label>
+                <input type="text" name="name_km" id="nameKmInput" maxlength="100"
+                    value="<?= htmlspecialchars($name_km) ?>"
+                    placeholder="<?= htmlspecialchars(t('category_name_km_placeholder')) ?>"
+                    class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1"><?= t('optional_translation_hint') ?></p>
             </div>
 
             <!-- Icon picker -->
@@ -122,7 +132,6 @@ require_once '../../includes/header.php';
         </form>
     </div>
 
-    <!-- Live Preview (1/3 width) -->
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center text-center">
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4"><?= t('preview_label') ?></p>
         <div class="w-16 h-16 flex items-center justify-center bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 rounded-full mb-3">

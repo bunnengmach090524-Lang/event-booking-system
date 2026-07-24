@@ -6,14 +6,20 @@ requireAdmin();
 require_once '../../includes/header.php';
 
 $categories = $pdo->query("
-    SELECT c.id, c.name, c.icon,
+    SELECT c.id, c.name, c.name_km, c.icon,
            (SELECT COUNT(*) FROM events e WHERE e.category = c.name) as events_count
     FROM categories c
     ORDER BY c.name ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<?php /* ... toast scripts unchanged ... */ ?>
+<?php if (isset($_SESSION['error'])): ?>
+<script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['error']) ?>, 'error'));</script>
+<?php unset($_SESSION['error']); endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+<script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['success']) ?>, 'success'));</script>
+<?php unset($_SESSION['success']); endif; ?>
 
 <div class="flex justify-between items-center mb-6">
     <div>
@@ -51,7 +57,12 @@ $categories = $pdo->query("
                         <?= renderIcon($cat['icon'], $iconSet, 'w-5 h-5') ?>
                     </div>
                 </td>
-                <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-100"><?= htmlspecialchars($cat['name']) ?></td>
+                <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-100">
+                    <?= htmlspecialchars(localized($cat['name_km'] ?? null, $cat['name'])) ?>
+                    <?php if (!empty($cat['name_km'])): ?>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 font-normal">(<?= htmlspecialchars($cat['name']) ?>)</span>
+                    <?php endif; ?>
+                </td>
                 <td class="px-6 py-4">
                     <a href="../events/index.php?category=<?= urlencode($cat['name']) ?>"
                        class="text-blue-600 dark:text-blue-400 hover:underline text-sm">

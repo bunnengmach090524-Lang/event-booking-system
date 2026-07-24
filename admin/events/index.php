@@ -1,6 +1,7 @@
 <?php
 require_once '../../config/database.php';
 require_once '../../includes/functions.php';
+require_once '../../includes/icons.php';
 require_once '../../includes/header.php';
 
 $locationFilter = trim($_GET['location'] ?? '');
@@ -66,12 +67,15 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <label class="text-sm font-semibold text-gray-600 dark:text-gray-300 flex items-center gap-1.5">
         🏷️ <?= t('filter_by_category_label') ?>
     </label>
+    <!-- Note: <select><option> can't render inline SVG icons, so this dropdown
+         shows text-only category names (no icon) — that's a native HTML <select>
+         limitation, not a bug. The icon still renders correctly in the table below. -->
     <select name="category" onchange="this.form.submit()"
         class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         <option value=""><?= t('all_categories_option') ?></option>
         <?php foreach ($allCategories as $cat): ?>
             <option value="<?= htmlspecialchars($cat['name']) ?>" <?= $categoryFilter === $cat['name'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cat['icon']) ?> <?= htmlspecialchars($cat['name']) ?>
+                <?= htmlspecialchars($cat['name']) ?>
             </option>
         <?php endforeach; ?>
     </select>
@@ -102,18 +106,25 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tr>
             <?php endif; ?>
 
-            <?php foreach ($events as $event): ?>
+            <?php foreach ($events as $event):
+                $catIconKey = $categoryIcons[$event['category']] ?? 'pin';
+            ?>
             <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                 <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-100"><?= htmlspecialchars($event['title']) ?></td>
                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                     <span class="inline-flex items-center gap-1.5 bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 px-2.5 py-1 rounded-full text-xs font-medium text-gray-600 dark:text-gray-300">
-                        <?= $categoryIcons[$event['category']] ?? '📌' ?> <?= htmlspecialchars($event['category']) ?>
+                        <?= renderIcon($catIconKey, $iconSet, 'w-3.5 h-3.5') ?> <?= htmlspecialchars($event['category']) ?>
                     </span>
                 </td>
                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                     <span class="inline-flex items-center gap-1">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"></i>
                         <?= htmlspecialchars($event['location']) ?>
+                        <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($event['location']) ?>"
+                           target="_blank" rel="noopener noreferrer" title="<?= htmlspecialchars(t('view_on_map_label')) ?>"
+                           class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 ml-0.5">
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </a>
                     </span>
                 </td>
                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400"><?= date('d M Y, h:i A', strtotime($event['event_date'])) ?></td>

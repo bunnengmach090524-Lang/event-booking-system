@@ -95,7 +95,7 @@
   function renderNotifications(list) {
     if (!notificationsDropdown) return;
     if (list.length === 0) {
-      notificationsDropdown.innerHTML = '<p class="px-4 py-2 text-gray-400 dark:text-gray-500 text-xs">No notifications yet</p>';
+      notificationsDropdown.innerHTML = '<p class="px-4 py-2 text-gray-400 dark:text-gray-500 text-xs"><?= t('no_notifications_label') ?></p>';
       return;
     }
     notificationsDropdown.innerHTML = list.map((n) => `

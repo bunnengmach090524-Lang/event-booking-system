@@ -448,4 +448,32 @@ return [
     'error_settings_update_generic' => 'There was a problem updating settings',
 
     'success_admin_updated' => 'Admin updated successfully.',
+    'nav_features'    => 'Feature',
+
+    'footer_address_fallback' => 'Phnom Penh, Cambodia',
+
+    'hero_tagline'        => 'Find Your Next Experience',   // homepage hero tagline
+    'stat_support_label'  => 'Support Online',              // login page stat
+    'language_label'      => 'Language',                    // navbar language label
+    'th_category'         => 'Category',                    // reports table header
+    'th_event'            => 'Event',                       // reports table header
+    'th_revenue'          => 'Revenue',                      // reports table header
+    'status_paid_label'   => 'Paid',                         // bookings/customers status badge
+    'status_pending_label'=> 'Pending',                      // bookings/customers status badge
+    'status_refunded_label'=> 'Refunded',                    // bookings/customers status badge
+
+    'no_favorites_left_label' => 'No favorites left',
+    'no_events_found_label'   => 'No events found',
+
+    'category_name_km_label'       => 'Khmer Name (Optional)',
+    'category_name_km_placeholder' => 'e.g. ការប្រគុំតន្ត្រី',
+    'optional_translation_hint'    => 'Leave blank to show the English name in Khmer mode too.',
+    'event_title_km_label'         => 'Khmer Title (Optional)',
+    'event_title_km_placeholder'   => 'e.g. ព្រឹត្តិការណ៍តន្ត្រី...',
+
+    'view_on_map_label' => 'View on map',   // en.php
+
+    // lang/en.php
+    'event_location_map_label' => 'Location',
+    'view_full_map_label' => 'View full map',
 ];

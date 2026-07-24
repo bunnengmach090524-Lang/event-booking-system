@@ -94,8 +94,8 @@ return [
     'feature3_desc'     => 'ទទួល Email បញ្ជាក់ការកក់ភ្លាមៗ ជាមួយ QR Code',
 
     // Featured Events
-    'upcoming_event_tag'     => 'Upcoming Event',
-    'featured_events_heading'=> 'Featured Events',
+    'upcoming_event_tag'      => 'ព្រឹត្តិការណ៍ជិតដល់',
+    'featured_events_heading' => 'ព្រឹត្តិការណ៍លេចធ្លោ',
     'no_events_match'        => 'មិនទាន់មាន Event ត្រូវនឹងលក្ខខណ្ឌស្វែងរកទេ',
     'price_label'            => 'តម្លៃ',
     'book_now_short'         => 'កក់ឥឡូវនេះ',
@@ -449,4 +449,31 @@ return [
     'error_settings_update_generic' => 'មានបញ្ហាក្នុងការធ្វើបច្ចុប្បន្នភាព',
 
     'success_admin_updated' => 'បានកែប្រែ Admin ដោយជោគជ័យ។',
+
+    'nav_features'    => 'លក្ខណៈពិសេស',
+
+    'footer_address_fallback' => 'ភ្នំពេញ កម្ពុជា',
+
+    'hero_tagline'         => 'ស្វែងរកបទពិសោធន៍បន្ទាប់របស់អ្នក',
+    'stat_support_label'   => 'ជំនួយអនឡាញ',
+    'language_label'       => 'ភាសា',
+    'th_category'          => 'ប្រភេទ',
+    'th_event'             => 'ព្រឹត្តិការណ៍',
+    'th_revenue'           => 'ចំណូល',
+    'status_paid_label'    => 'បានទូទាត់',
+    'status_pending_label' => 'កំពុងរង់ចាំ',
+    'status_refunded_label'=> 'បានសងវិញ',
+
+    'no_favorites_left_label' => 'គ្មានចំណូលចិត្តទៀតទេ',
+    'no_events_found_label'   => 'រកមិនឃើញ Event ទេ',
+
+    'category_name_km_label'       => 'ឈ្មោះជាភាសាខ្មែរ (មិនចាំបាច់)',
+    'category_name_km_placeholder' => 'ឧ. ការប្រគុំតន្ត្រី',
+    'optional_translation_hint'    => 'ទុកទទេ ដើម្បីបង្ហាញឈ្មោះជាភាសាអង់គ្លេស ក្នុងម៉ូដខ្មែរផងដែរ។',
+    'event_title_km_label'         => 'ចំណងជើងជាភាសាខ្មែរ (មិនចាំបាច់)',
+    'event_title_km_placeholder'   => 'ឧ. ព្រឹត្តិការណ៍តន្ត្រី...',
+
+    'view_on_map_label' => 'មើលទីតាំង',      // km.php
+    'event_location_map_label' => 'ទីតាំង',
+    'view_full_map_label' => 'មើលទីតាំងពេញ',
 ];

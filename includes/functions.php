@@ -83,3 +83,12 @@ function csrfCheck(): void {
         die('❌ Invalid CSRF token — សូម refresh ទំព័រ ហើយព្យាយាមម្តងទៀត');
     }
 }
+
+
+function localized(?string $kmValue, string $defaultValue): string {
+    global $currentLang;
+    if ($currentLang === 'km' && !empty($kmValue)) {
+        return $kmValue;
+    }
+    return $defaultValue;
+}

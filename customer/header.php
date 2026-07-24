@@ -72,7 +72,7 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
             </div>
 
             <!-- Theme toggle -->
-            <button id="themeToggle" aria-label="Toggle theme"
+            <button id="themeToggle" aria-label="<?= htmlspecialchars(t('theme_toggle_label')) ?>"
                     class="w-9 h-9 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0">
                 <i data-lucide="sun" class="w-4 h-4 dark:hidden"></i>
                 <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
@@ -96,7 +96,7 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
                 </button>
                 <div id="notificationsDropdown" hidden
                      class="absolute right-0 mt-2 w-72 max-w-[90vw] bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg shadow-lg py-2 text-sm max-h-80 overflow-y-auto">
-                    <p class="px-4 py-2 text-gray-400 dark:text-gray-500 text-xs">No notifications yet</p>
+                    <p class="px-4 py-2 text-gray-400 dark:text-gray-500 text-xs"><?= t('no_notifications_label') ?></p>
                 </div>
             </div>
 
@@ -147,7 +147,7 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
         </a>
         <!-- Language toggle for very small screens where it's hidden in the icon row -->
         <div class="xs:hidden flex items-center justify-between px-3 py-2.5">
-            <span class="text-sm text-gray-500 dark:text-gray-400"><?= t('nav_events') ?? 'Language' ?></span>
+            <span class="text-sm text-gray-500 dark:text-gray-400"><?= t('language_label') ?></span>
             <div id="langToggleMobile" data-current="<?= htmlspecialchars($currentLang) ?>"
                  class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 text-xs font-medium cursor-pointer select-none">
                 <span data-lang="en" class="lang-option px-2.5 py-1 rounded-full text-gray-500 dark:text-gray-300">EN</span>
@@ -163,6 +163,15 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
     </div>
 </nav>
 
+<script>
+    // Translation strings passed to navbar.js and this file's own inline script,
+    // since plain .js files can't call PHP's t() directly.
+    window.i18nNav = {
+        noNotifications: <?= json_encode(t('no_notifications_label'), JSON_UNESCAPED_UNICODE) ?>,
+        noFavoritesLeft: <?= json_encode(t('no_favorites_left_label'), JSON_UNESCAPED_UNICODE) ?>,
+        noEventsFound: <?= json_encode(t('no_events_found_label'), JSON_UNESCAPED_UNICODE) ?>
+    };
+</script>
 <script src="/event-booking/assets/js/navbar.js" defer></script>
 <script>
     // Mobile hamburger menu toggle (kept separate from navbar.js to avoid touching working code)
@@ -176,9 +185,6 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
         }
 
         // Mirror the mobile search input to the same suggestion logic as desktop.
-        // We reuse the desktop #navSearchInput handlers by simply forwarding
-        // typed value + firing the same fetch, since navbar.js targets IDs directly
-        // we duplicate a light fetch call here for the mobile input.
         const mobileInput = document.getElementById('navSearchInputMobile');
         const mobileDropdown = document.getElementById('searchSuggestionsMobile');
         let mobileDebounce = null;
@@ -199,7 +205,7 @@ $userInitial = mb_strtoupper(mb_substr($_SESSION['name'], 0, 1));
                         .then(data => {
                             if (!data.success) return;
                             if (data.results.length === 0) {
-                                mobileDropdown.innerHTML = '<p class="px-4 py-3 text-gray-400 dark:text-gray-500 text-xs">No events found</p>';
+                                mobileDropdown.innerHTML = `<p class="px-4 py-3 text-gray-400 dark:text-gray-500 text-xs">${window.i18nNav?.noEventsFound || 'No events found'}</p>`;
                                 mobileDropdown.hidden = false;
                                 return;
                             }

@@ -46,6 +46,13 @@ $categoryIcons = [
 // ===== Site branding (logo + name), same source as admin dashboard =====
 $siteLogo = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'logo'")->fetchColumn();
 $siteName = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'site_name'")->fetchColumn();
+$totalEventsCount = $pdo->query("SELECT COUNT(*) FROM events")->fetchColumn();
+$totalCustomersCount = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'customer'")->fetchColumn();
+$contactEmail   = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'contact_email'")->fetchColumn() ?: 'support@eventplace.com';
+$contactPhone   = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'contact_phone'")->fetchColumn() ?: '+855 12 345 678';
+$contactAddress = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 'contact_address'")->fetchColumn() ?: t('footer_address_fallback');
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -329,11 +336,11 @@ $siteName = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 
             </p>
             <div class="grid grid-cols-3 gap-6">
                 <div>
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">500+</p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400"><?= number_format($totalEventsCount) ?>+</p>
                     <p class="text-gray-400 dark:text-gray-500 text-sm"><?= t('stat_events_label') ?></p>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">10K+</p>
+                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400"><?= number_format($totalCustomersCount) ?>+</p>
                     <p class="text-gray-400 dark:text-gray-500 text-sm"><?= t('stat_users_label') ?></p>
                 </div>
                 <div>
@@ -392,11 +399,11 @@ $siteName = $pdo->query("SELECT setting_value FROM settings WHERE setting_key = 
             </ul>
         </div>
         <div>
-            <h4 class="text-white font-semibold mb-4"><?= t('footer_contact_heading') ?></h4>
+        <h4 class="text-white font-semibold mb-4"><?= t('footer_contact_heading') ?></h4>
             <ul class="space-y-3 text-sm">
-                <li class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> support@eventplace.com</li>
-                <li class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> +855 12 345 678</li>
-                <li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Phnom Penh, Cambodia</li>
+                <li class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> <a href="mailto:<?= htmlspecialchars($contactEmail) ?>" class="hover:text-white transition"><?= htmlspecialchars($contactEmail) ?></a></li>
+                <li class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $contactPhone)) ?>" class="hover:text-white transition"><?= htmlspecialchars($contactPhone) ?></a></li>
+                <li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> <?= htmlspecialchars($contactAddress) ?></li>
             </ul>
         </div>
     </div>

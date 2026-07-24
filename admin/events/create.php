@@ -1,7 +1,9 @@
 <?php
 require '../../config/database.php';
-require '../../includes/header.php';
+require '../../includes/functions.php';
+require '../../includes/lang.php';
 require '../../includes/icons.php';
+requireAdmin();
 
 $error = '';
 
@@ -81,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/event-booking/admin/events/index.php');
     }
 }
+
+require '../../includes/header.php';
 ?>
 
 <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6"><?= t('create_event_page_title') ?></h1>
